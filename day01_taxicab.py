@@ -31,6 +31,16 @@ For example:
 -R5, L5, R5, R3 leaves you 12 blocks away.
 
 How many blocks away is Easter Bunny HQ?
+
+--- Part Two ---
+
+Then, you notice the instructions continue on the back of the Recruiting
+Document. Easter Bunny HQ is actually at the first location you visit twice.
+
+For example, if your instructions are R8, R4, R4, R8, the first location you
+visit twice is 4 blocks away, due East.
+
+How many blocks away is the first location you visit twice?
 """
 
 from common import parse_input
@@ -55,7 +65,7 @@ def travel(path, direction=0):
         direction -- the current direction you are facing
         path -- a list of instructions you are following:
             rotation -- how much to turn (radians)
-            steps -- how far to go
+            steps -- how far to go in new direction
 
     Returns:
         a complex number indicating your position on
@@ -69,6 +79,18 @@ def travel(path, direction=0):
         return steps*e**(new_direction*1j) + travel(path[1:], new_direction)
 
 
+def travel_duplicate(path, direction=pi/2):
+    pos_hist = []
+    position = 0
+    for rotation, steps in path:
+        direction = direction + rotation
+        for _ in range(steps):
+            pos_hist.append(position)
+            delta = e**(direction*1j)
+            position += round(delta.real) + round(delta.imag)*1j
+            if position in pos_hist: return position
+
+
 def blocks_away(position):
     """Calculate how many blocks away you are.
     
@@ -78,11 +100,15 @@ def blocks_away(position):
     return round(abs(position.real)+abs(position.imag))
 
 
-def no_time_for_taxicab():
-    puzzle_input = parse_input(1)
-    path = convert_input(puzzle_input)
-    print('Blocks away:', blocks_away(travel(path)))
+def part_one(path):
+    print('Part one --', 'Blocks away:', blocks_away(travel(path)))
+
+
+def part_two(path):
+    print('Part two --', 'Blocks away:', blocks_away(travel_duplicate(path)))
 
 
 if __name__ == '__main__':
-    no_time_for_taxicab()
+    path = convert_input(parse_input(1))
+    part_one(path)
+    part_two(path)
