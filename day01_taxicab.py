@@ -36,6 +36,7 @@ How many blocks away is Easter Bunny HQ?
 from common import parse_input
 from math import pi, e
 
+
 def convert_input(puzzle_input):
     directions_str = puzzle_input.replace(' ', '').split(',')
     directions = []
