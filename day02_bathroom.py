@@ -80,7 +80,7 @@ from common import parse_input
 def convert_input(puzzle_input):
     mov = {'U': (0, 1), 'R': (1, 0), 'D': (0, -1), 'L': (-1, 0)}
     return [[mov[instr] for instr in line]
-            for line in puzzle_input.split('\n')][:-1]
+            for line in puzzle_input.split('\n')]
 
 
 def travel(instructions, start, keypad):
@@ -103,7 +103,7 @@ def part_one(instructions):
               (1, 0): '8', (1, 1): '5', (1, 2): '2',
               (2, 0): '9', (2, 1): '6', (2, 2): '3'}
 
-    print(travel(instructions, (1, 1), keypad))
+    print('Part one -- Keycode:', travel(instructions, (1, 1), keypad))
 
 
 def part_two(instructions):
@@ -115,7 +115,7 @@ def part_two(instructions):
                                   (2, 0): 'D'
     }
 
-    print(travel(instructions, (1, 1), keypad))
+    print('Part two -- Keycode:', travel(instructions, (1, 1), keypad))
 
 
 if __name__ == '__main__':

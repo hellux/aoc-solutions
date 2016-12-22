@@ -49,7 +49,6 @@ def convert_input(puzzle_input):
     Room = namedtuple('Room', ['id', 'checksum', 'encrypted_name', 'name'])
     rooms = []
     for room in puzzle_input.split('\n'):
-        if not room: continue
 
         encrypted_name = room[:-11]
         ID = int(room[-10:-7])

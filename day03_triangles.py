@@ -42,7 +42,7 @@ from common import parse_input, quicksort
 
 def convert_input(puzzle_input):
     return [[float(side) for side in triangle.split()] 
-            for triangle in puzzle_input.split('\n')][:-1]
+            for triangle in puzzle_input.split('\n')]
 
 
 def is_triangle(sides):

@@ -4,7 +4,7 @@ def read_file(path):
 
 
 def parse_input(day):
-    return read_file('input/{:02d}.txt'.format(day))
+    return read_file('input/{:02d}.txt'.format(day)).strip()
 
 
 def quicksort(seq):
