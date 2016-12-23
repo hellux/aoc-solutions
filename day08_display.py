@@ -72,6 +72,10 @@ from common import parse_input
 from time import sleep
 
 
+PIXEL_ON = '█'
+PIXEL_OFF = '░'
+
+
 def convert_input(puzzle_input):
     return [[token for token in instructions.split()]
                    for instructions in puzzle_input.split('\n')]
@@ -88,7 +92,7 @@ def rotate(string, n):
 def draw_rect(w, h, screen):
     screen = screen.copy()
     for i in range(h):
-        screen[i] = '#'*w + screen[i][w:]
+        screen[i] = PIXEL_ON*w + screen[i][w:]
     return screen
 
 
@@ -131,11 +135,13 @@ def draw_screen(instructions, screen):
 
 
 def display_screen(screen):
+    print()
     for row in screen:
         print(row)
+    print()
 
 def lit_pixels(screen):
-    return sum(row.count('#') for row in screen)
+    return sum(row.count(PIXEL_ON) for row in screen)
 
 
 def part_one(screen):
@@ -148,7 +154,7 @@ def part_two(screen):
 
 if __name__ == '__main__':
     instructions = convert_input(parse_input(8))
-    screen = ['.'*50 for _ in range(6)]
+    screen = [PIXEL_OFF*50 for _ in range(6)]
     screen = draw_screen(instructions, screen)
     part_one(screen)
     part_two(screen)
