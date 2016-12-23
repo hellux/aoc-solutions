@@ -40,7 +40,7 @@ For example, the real name for qzmt-zixmtkozy-ivhz-343 is very encrypted name.
 What is the sector ID of the room where North Pole objects are stored?
 """
 
-from common import parse_input
+from common import parse_input, count_freq
 from collections import namedtuple
 from operator import itemgetter
 
@@ -72,14 +72,6 @@ def calculate_checksum(string):
     freqs_freq_alph = sorted(freqs_alph, key=itemgetter(1), reverse=True)
 
     return ''.join([x[0] for x in freqs_freq_alph[:5]])
-
-
-def count_freq(string):
-    freqs = {}
-    for char in string:
-        if char in freqs: freqs[char] += 1
-        else: freqs[char] = 1
-    return freqs
 
 
 def sum_ids(rooms):

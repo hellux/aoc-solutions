@@ -21,3 +21,11 @@ def quicksort(seq):
         else: equal.append(scalar)
 
     return quicksort(lesser) + equal + quicksort(greater)
+
+
+def count_freq(string):
+    freqs = {}
+    for char in string:
+        if char in freqs: freqs[char] += 1
+        else: freqs[char] = 1
+    return freqs
