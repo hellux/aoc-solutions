@@ -1,4 +1,5 @@
-{--- Day 1: Inverse Captcha ---
+{-
+--- Day 1: Inverse Captcha ---
 
 The night before Christmas, one of Santa's Elves calls you in a panic. "The
 printer's broken! We can't print the Naughty or Nice List!" By the time you
@@ -41,33 +42,71 @@ digit and the third digit (2) matches the fourth digit.
 91212129 produces 9 because the only digit that matches the next one is the
 last digit, 9.
 
-What is the solution to your captcha? -}
+What is the solution to your captcha? 
+
+--- Part Two ---
+
+You notice a progress bar that jumps to 50% completion. Apparently, the door
+isn't yet satisfied, but it did emit a star as encouragement. The instructions
+change:
+
+Now, instead of considering the next digit, it wants you to consider the digit
+halfway around the circular list. That is, if your list contains 10 items, only
+include a digit in your sum if the digit 10/2 = 5 steps forward matches it.
+Fortunately, your list has an even number of elements.
+
+For example:
+
+1212 produces 6: the list contains 4 items, and all four digits match the digit
+2 items ahead.
+
+1221 produces 0, because every comparison is between a 1 and a 2.
+
+123425 produces 4, because both 2s match each other, but no other digit has a
+match.
+
+123123 produces 12.
+
+12131415 produces 4.
+
+What is the solution to your new captcha?
+-}
 
 import Data.Char (digitToInt)
 
-checksumrec :: Int -> [Int] -> Int
+checksum :: [Int] -> Int -> Int -> Int
+checksum (x:xs) i skip =
+    if i <= 0 then 0
+    else 
+        if x == xs !! (skip-1)
+            then x + checksum xs (i-1) skip
+            else checksum xs (i-1) skip
 
-checksumrec start (x:xs) =
-    if length xs > 0
-        then 
-            if x == head xs
-                then x + checksumrec start xs
-                else checksumrec start xs
-        else
-            if x == start
-                then x
-                else 0
+checksum1 :: [Int] -> Int
+checksum1 xs = checksum (cycle xs) (length xs) (1)
 
-checksum :: [Int] -> Int
-checksum xs = checksumrec (head xs) xs
-
+checksum2 :: [Int] -> Int
+checksum2 xs = checksum (cycle xs) (length xs) ((length xs) `div` 2)
 
 main :: IO ()
 main = do 
     input <- getLine
     let list = map digitToInt input
-    print $ checksum [1,1,2,2]
-    print $ checksum [1,1,1,1]
-    print $ checksum [1,2,3,2]
-    print $ checksum [9,1,2,1,2,1,2,9]
-    print $ checksum list
+
+    -- part 1
+    putStrLn "Part 1:"
+    print $ checksum1 [1,1,2,2]
+    print $ checksum1 [1,1,1,1]
+    print $ checksum1 [1,2,3,2]
+    print $ checksum1 [9,1,2,1,2,1,2,9]
+    print $ checksum1 list
+
+    -- part 2
+    putStrLn "\nPart 2:"
+
+    print $ checksum2 [1,2,1,2]
+    print $ checksum2 [1,2,2,1]
+    print $ checksum2 [1,2,3,4,2,5]
+    print $ checksum2 [1,2,3,1,2,3]
+    print $ checksum2 [1,2,1,3,1,4,1,5]
+    print $ checksum2 list
