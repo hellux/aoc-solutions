@@ -66,7 +66,7 @@ func part2(ids []string, n int) string {
 
 func main() {
     bytes, _ := ioutil.ReadAll(os.Stdin)
-    ids := strings.Split(string(bytes), " ")
+    ids := strings.Split(string(bytes), "\n")
     n := len(ids)
 
     fmt.Println(part1(ids, n))

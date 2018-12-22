@@ -11,6 +11,6 @@ shift $((OPTIND-1))
 day=$1
 day_dir="$(echo day$(printf "%02d" "$day")*)"
 
-[ -z "$input" ] && input="$(echo $(cat "$day_dir/input"))"
+[ -z "$input" ] && input="$(cat "$day_dir/input")"
 
 printf "$input" | go run "$day_dir/solution.go"

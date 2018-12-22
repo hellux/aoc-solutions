@@ -54,7 +54,7 @@ func part2(changes []int, n int) int {
 
 func main() {
     bytes, _ := ioutil.ReadAll(os.Stdin)
-    lines := strings.Split(string(bytes), " ")
+    lines := strings.Split(string(bytes), "\n")
     n := len(lines)
 
     changes := make([]int, n)
