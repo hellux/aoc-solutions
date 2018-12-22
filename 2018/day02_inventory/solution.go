@@ -35,6 +35,8 @@ func part1(ids []string, n int) int {
     return doublets*triplets
 }
 
+/* XXX differing letter may cause similar ids to be far apart in sorted list,
+       causing this function to fail */
 func part2(ids []string, n int) string {
     sort.Strings(ids)
 

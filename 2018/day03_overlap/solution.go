@@ -62,8 +62,8 @@ func part12(claims []claim, n int) (int, int) {
         }
     }
 
-    intact := 0
     /* find non-overlapping claim */
+    intact := 0
     for i := 0; i < n; i++ {
         if !claims[i].overlaps {
             intact = claims[i].id
@@ -72,14 +72,6 @@ func part12(claims []claim, n int) (int, int) {
     }
 
     return overlaps, intact
-}
-
-type tree struct {
-    left *tree
-    x int
-    y int
-    overlap bool
-    right *tree
 }
 
 func main() {
@@ -95,6 +87,7 @@ func main() {
             &claims[i].y,
             &claims[i].width,
             &claims[i].height)
+        claims[i].overlaps = false
     }
 
     fmt.Println(part12(claims, n))
