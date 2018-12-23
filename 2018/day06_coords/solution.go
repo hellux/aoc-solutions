@@ -53,7 +53,8 @@ func part1(points []point, n int) int {
             }
 
             if close_count == 1 {
-                if areas[closest] < 0 || x == min_x || x == max_x || y == min_y || y == max_y {
+                if areas[closest] < 0 || x == min_x || x == max_x ||
+                                         y == min_y || y == max_y {
                     areas[closest] = -1
                 } else {
                     areas[closest]++
@@ -72,6 +73,46 @@ func part1(points []point, n int) int {
     return max_area
 }
 
+func part2(points []point, n int) int {
+    const MAX_DISTANCE = 10000
+    /* find total range of all points */
+    min_x := points[0].x; max_x := points[0].x
+    min_y := points[0].y; max_y := points[0].y
+    for i := 1; i < n; i++ {
+        if points[i].x < min_x {
+            min_x = points[i].x
+        }
+        if points[i].x > max_x {
+            max_x = points[i].x
+        }
+        if points[i].y < min_y {
+            min_y = points[i].y
+        }
+        if points[i].y > max_y {
+            max_y = points[i].y
+        }
+    }
+
+    region_size := 0
+    for y := min_y; y <= max_y ; y++ {
+        for x := min_x; x < max_x; x++ {
+            total_distance := 0.0
+            for i := 0; i < n; i++ {
+                distance := math.Abs(points[i].x-x)+math.Abs(points[i].y-y)
+                total_distance += distance
+                if total_distance > MAX_DISTANCE {
+                    break
+                }
+            }
+            if total_distance < MAX_DISTANCE {
+                region_size++
+            }
+        }
+    }
+
+    return region_size
+}
+
 func main() {
     bytes, _ := ioutil.ReadAll(os.Stdin)
     lines := strings.Split(string(bytes), "\n")
@@ -83,4 +124,5 @@ func main() {
     }
 
     fmt.Println(part1(points, n))
+    fmt.Println(part2(points, n))
 }
