@@ -43,10 +43,11 @@ func part1(serial int) (int, int) {
 
 func part2(serial int) (int, int, int) {
     /* cache power levels */
-    powers := make([]int, WIDTH*HEIGHT)
+    powers := make([][]int, HEIGHT)
     for y := 1; y <= HEIGHT; y++ {
+        powers[y-1] = make([]int, WIDTH)
         for x := 1; x <= WIDTH; x++ {
-            powers[(y-1)*WIDTH+(x-1)] = power_level(x, y, serial)
+            powers[y-1][x-1] = power_level(x, y, serial)
         }
     }
 
@@ -59,7 +60,7 @@ func part2(serial int) (int, int, int) {
             sum := 0
             for ys := y; ys < y+size; ys++ {
                 for xs := 1; xs <= size; xs++ {
-                    sum += powers[(ys-1)*WIDTH+(xs-1)]
+                    sum += powers[ys-1][xs-1]
                 }
             }
 
@@ -73,10 +74,8 @@ func part2(serial int) (int, int, int) {
 
                 /* remove first column and add next to sum */
                 for yc := y; yc < y+size; yc++ {
-                    x_in := x+size
-                    x_out := x
-                    sum += powers[(yc-1)*WIDTH+(x_in-1)]
-                    sum -= powers[(yc-1)*WIDTH+(x_out-1)]
+                    sum -= powers[yc-1][x-1]
+                    sum += powers[yc-1][x+size-1]
                 }
             }
         }
