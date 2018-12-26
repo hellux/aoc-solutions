@@ -8,7 +8,6 @@ import (
 )
 
 const CHAR_PLANT = '#'
-const CHAR_EMPTY = '.'
 
 func evolve(plants map[int]bool, rules [32]bool) (map[int]bool, uint64) {
     /* find min and max positions of plants */

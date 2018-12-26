@@ -15,7 +15,6 @@ type pixel struct {
     vel image.Point
 }
 
-const MAX_RES = 2000
 const MOVE_RATIO = 10
 const RESIZE_FACTOR = 1.1
 
