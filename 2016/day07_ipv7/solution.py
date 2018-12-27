@@ -46,7 +46,7 @@ For example:
 How many IPs in your puzzle input support SSL?
 """
 
-from common import parse_input
+import sys
 from collections import namedtuple
 import re
 
@@ -149,6 +149,6 @@ def part_two(addresses):
 
 
 if __name__ == '__main__':
-    addresses = convert_input(parse_input(7))
+    addresses = convert_input(sys.stdin.read())
     part_one(addresses)
     part_two(addresses)

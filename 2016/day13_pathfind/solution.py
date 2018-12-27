@@ -51,7 +51,6 @@ current location, 1,1).
 What is the fewest number of steps required for you to reach 31,39?
 """
 
-from common import parse_input
 from time import sleep
 
 WALL = '█'
@@ -123,6 +122,6 @@ def part_one(seed):
 
 
 if __name__ == '__main__':
-    seed = int(parse_input(13))
+    seed = int(input())
     seed = 1364
     part_one(seed)

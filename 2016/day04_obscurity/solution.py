@@ -40,7 +40,7 @@ For example, the real name for qzmt-zixmtkozy-ivhz-343 is very encrypted name.
 What is the sector ID of the room where North Pole objects are stored?
 """
 
-from common import parse_input, count_freq
+import sys
 from collections import namedtuple
 from operator import itemgetter
 
@@ -49,7 +49,6 @@ def convert_input(puzzle_input):
     Room = namedtuple('Room', ['id', 'checksum', 'encrypted_name', 'name'])
     rooms = []
     for room in puzzle_input.split('\n'):
-
         encrypted_name = room[:-11]
         ID = int(room[-10:-7])
         checksum = room[-6:-1]
@@ -64,6 +63,14 @@ def get_valid_rooms(rooms):
         filter(lambda r: r.checksum == calculate_checksum(r.encrypted_name),
                rooms)
     )
+
+
+def count_freq(string):
+    freqs = {}
+    for char in string:
+        if char in freqs: freqs[char] += 1
+        else: freqs[char] = 1
+    return freqs
 
 
 def calculate_checksum(string):
@@ -96,7 +103,7 @@ def part_two(rooms):
 
 
 if __name__ == '__main__':
-    valid_rooms = get_valid_rooms(convert_input(parse_input(4)))
+    valid_rooms = get_valid_rooms(convert_input(sys.stdin.read()))
     part_one(valid_rooms)
     part_two(valid_rooms)
 

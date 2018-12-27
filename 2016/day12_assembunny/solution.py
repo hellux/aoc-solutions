@@ -57,7 +57,7 @@ If you instead initialize register c to be 1, what value is now left in
 register a?
 """
 
-from common import parse_input
+import sys
 
 
 def run_program(program, variables):
@@ -110,6 +110,6 @@ def part_two(program):
 
 
 if __name__ == '__main__':
-    program = parse_input(12)
-    #part_one(program)
+    program = sys.stdin.read()
+    part_one(program)
     part_two(program)

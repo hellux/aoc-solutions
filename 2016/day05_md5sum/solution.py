@@ -57,7 +57,6 @@ Given the actual Door ID and this new method, what is the password? Be extra
 proud of your solution if it uses a cinematic "decrypting" animation.
 """
 
-from common import parse_input
 from hashlib import md5
 
 from random import randint
@@ -125,6 +124,6 @@ def part_two(door_id):
 
 
 if __name__ == '__main__':
-    door_id = parse_input(5)
-    #part_one(door_id)
+    door_id = input()
+    part_one(door_id)
     part_two(door_id)

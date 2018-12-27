@@ -68,7 +68,7 @@ font it uses, each letter is 5 pixels wide and 6 tall.
 After you swipe your card, what code is the screen trying to display?
 """
 
-from common import parse_input
+import sys
 from time import sleep
 
 
@@ -153,7 +153,7 @@ def part_two(screen):
     display_screen(screen)
 
 if __name__ == '__main__':
-    instructions = convert_input(parse_input(8))
+    instructions = convert_input(sys.stdin.read())
     screen = [PIXEL_OFF*50 for _ in range(6)]
     screen = draw_screen(instructions, screen)
     part_one(screen)

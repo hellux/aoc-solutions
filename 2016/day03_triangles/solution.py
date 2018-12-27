@@ -37,12 +37,27 @@ In your puzzle input, and instead reading by columns, how many of the listed
 triangles are possible?
 """
 
-from common import parse_input, quicksort
-
+import sys
 
 def convert_input(puzzle_input):
     return [[float(side) for side in triangle.split()] 
             for triangle in puzzle_input.split('\n')]
+
+
+def quicksort(seq):
+    if len(seq) <= 1: return seq
+
+    pivot = seq[0]
+    lesser = []
+    equal = []
+    greater = []
+
+    for scalar in seq:
+        if scalar < pivot: lesser.append(scalar)
+        elif scalar > pivot: greater.append(scalar)
+        else: equal.append(scalar)
+
+    return quicksort(lesser) + equal + quicksort(greater)
 
 
 def is_triangle(sides):
@@ -67,6 +82,6 @@ def part_two(triangles):
 
 
 if __name__ == '__main__':
-    triangles = convert_input(parse_input(3))
+    triangles = convert_input(sys.stdin.read())
     part_one(triangles)
     part_two(triangles)

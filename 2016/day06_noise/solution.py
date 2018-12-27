@@ -54,12 +54,20 @@ Given the recording in your puzzle input and this new decoding methodology, what
 is the original message that Santa is trying to send?
 """
 
-from common import parse_input, count_freq
+import sys
 from operator import itemgetter
 
 
 def convert_input(puzzle_input):
     return puzzle_input.split('\n')
+
+
+def count_freq(string):
+    freqs = {}
+    for char in string:
+        if char in freqs: freqs[char] += 1
+        else: freqs[char] = 1
+    return freqs
 
 
 def cancel_noise(data, frequent=True):
@@ -81,6 +89,6 @@ def part_two(data):
 
 
 if __name__ == '__main__':
-    data = convert_input(parse_input(6))
+    data = convert_input(sys.stdin.read())
     part_one(data)
     part_two(data)

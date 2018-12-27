@@ -42,7 +42,7 @@ Based on your instructions, what is the number of the bot that is responsible
 for comparing value-61 microchips with value-17 microchips?
 """
 
-from common import parse_input
+import sys
 
 def convert_input(puzzle_input):
     return puzzle_input.split('\n')
@@ -128,6 +128,6 @@ if __name__ == '__main__':
     LOW = 0
     HIGH = 1
 
-    instructions = convert_input(parse_input(10))
+    instructions = convert_input(sys.stdin.read())
     bots = simulate(instructions)
     part_one(bots)

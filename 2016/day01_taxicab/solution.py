@@ -43,7 +43,6 @@ visit twice is 4 blocks away, due East.
 How many blocks away is the first location you visit twice?
 """
 
-from common import parse_input
 from math import pi, e
 
 
@@ -109,6 +108,6 @@ def part_two(path):
 
 
 if __name__ == '__main__':
-    path = convert_input(parse_input(1))
+    path = convert_input(input())
     part_one(path)
     part_two(path)

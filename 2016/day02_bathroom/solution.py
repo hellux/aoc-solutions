@@ -74,8 +74,7 @@ So, given the actual keypad layout, the code would be 5DB3.
 Using the same instructions in your puzzle input, what is the correct bathroom code?
 """
 
-from common import parse_input
-
+import sys
 
 def convert_input(puzzle_input):
     mov = {'U': (0, 1), 'R': (1, 0), 'D': (0, -1), 'L': (-1, 0)}
@@ -119,6 +118,6 @@ def part_two(instructions):
 
 
 if __name__ == '__main__':
-    instructions = convert_input(parse_input(2))
+    instructions = convert_input(sys.stdin.read())
     part_one(instructions)
     part_two(instructions)

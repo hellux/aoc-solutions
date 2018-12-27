@@ -62,8 +62,6 @@ decompressed length.
 What is the decompressed length of the file using this improved format?
 """
 
-from common import parse_input
-
 
 def find_marker(string):
     start = string.find('(')
@@ -107,6 +105,6 @@ def part_two(compressed):
 
 
 if __name__ == '__main__':
-    compressed_string = parse_input(9)
+    compressed_string = input()
     part_one(compressed_string)
     part_two(compressed_string)
