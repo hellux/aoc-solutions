@@ -1,4 +1,4 @@
-# usage: ./run.sh day or ./run.sh -i "INPUT" day
+# usage: ./run.sh year day or ./run.sh -i "INPUT" year day
 
 input=""
 input_file=""
@@ -10,12 +10,16 @@ while getopts i:I: flag; do
 done
 shift $((OPTIND-1))
 
-day=$1
-day_dir="$(echo day$(printf "%02d" "$day")*)"
+year=$1
+day=$(printf "%02d" $2)
+day_dir="$(echo $year/day$day*)"
+executable="$day_dir/solution"
 
 if [ -z "$input" ]; then
     [ -z "$input_file" ] && input_file="$day_dir/input"
     input="$(cat "$input_file")"
 fi
 
-printf "$input" | go run "$day_dir/solution.go"
+make $executable
+printf "$input" | "./$executable"
+rm $executable
