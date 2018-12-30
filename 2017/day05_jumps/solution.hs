@@ -1,15 +1,13 @@
-import qualified Data.Sequence as S
+import qualified Data.Sequence as Seq
 
-jump jmps i instr change
-    | 0 <= i && i < S.length instr =
-        jump (jmps+1)
-        (i + S.index instr i)
-        (S.update i (change (S.index instr i)) instr)
-        change
+jump change jmps i instr
+    | 0 <= i && i < Seq.length instr =
+        jump change (jmps+1) (i + Seq.index instr i)
+        (Seq.update i (change (Seq.index instr i)) instr)
     | otherwise = jmps
 
-part1 jumps = jump 0 0 (S.fromList jumps) succ
-part2 jumps = jump 0 0 (S.fromList jumps) change
+part1 jumps = jump succ 0 0 (Seq.fromList jumps)
+part2 jumps = jump change 0 0 (Seq.fromList jumps)
     where change x | x >= 3 = x-1 | otherwise = x+1
 
 main :: IO ()
