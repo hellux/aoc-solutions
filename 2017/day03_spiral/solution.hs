@@ -2,8 +2,8 @@
  - [a,b,c,c,d,d,e,e,e,d,d,d...], where each value repeats 1 extra time every
  - other value -}
 spiralseq sequence =
-    foldr (++) [] $ map f (zip [0..] [div a 2 + mod a 2 | a <- [1..]])
-    where f (i, x) = replicate x $ sequence !! i
+    foldr (++) [] $ zipWith f [0..] [div a 2 + mod a 2 | a <- [1..]]
+    where f i x = replicate x $ sequence !! i
 
 spiralcum sequence = scanl (+) 0 $ spiralseq $ sequence
 
