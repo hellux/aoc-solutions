@@ -1,11 +1,12 @@
+import Data.List (concat, concatMap)
+
 {- spiraling sequence from given sequence [a,b,c,d..]:
  - [a,b,c,c,d,d,e,e,e,d,d,d...], where each value repeats 1 extra time every
  - other value -}
-spiralseq sequence =
-    foldr (++) [] $ zipWith f [0..] [div a 2 + mod a 2 | a <- [1..]]
-    where f i x = replicate x $ sequence !! i
+spiralseq seq = concat $ zipWith f [0..] $ concatMap (replicate 2) [1..]
+                where f i x = replicate x (seq !! i)
 
-spiralcum sequence = scanl (+) 0 $ spiralseq $ sequence
+spiralcum seq = scanl (+) 0 $ spiralseq $ seq
 
 {-       x
  -    -1 0 1
