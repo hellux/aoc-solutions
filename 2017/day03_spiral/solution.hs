@@ -1,4 +1,4 @@
-import Data.List (concat, concatMap)
+import Data.List (find)
 
 {- spiraling sequence from given sequence [a,b,c,d..]:
  - [a,b,c,c,d,d,e,e,e,d,d,d...], where each value repeats 1 extra time every
@@ -36,7 +36,7 @@ square_value i = sum $ map square_value (adjacent i)
                         abs(spiral_x !! (i0-1) - spiral_x !! (i-1)) <= 1,
                         abs(spiral_y !! (i0-1) - spiral_y !! (i-1)) <= 1]
 square_values = map square_value [1..]
-part2 square = head [x | x <- square_values, x > square]
+part2 square = find (>square) square_values
 
 main :: IO ()
 main = do
