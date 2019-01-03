@@ -37,14 +37,15 @@ part1 = bottomProgram
 weightTower prgm tower =
     weight prgm tower + sum [weightTower p tower | p <- above prgm tower]
 
-unbalanced prgm tower = pat grps where
-    grps = let cmp = compare `on` (`weightTower` tower)
-           in sortBy (compare `on` length) $
-              groupBy (\x y -> cmp x y == EQ) $
-              sortBy cmp (above prgm tower) 
-    pat [] = Nothing
-    pat [bal] = Just prgm
-    pat ([unbal]:_) = unbalanced unbal tower
+unbalanced prgm tower = case grps of
+                            [] -> Nothing
+                            [bal] -> Just prgm
+                            ([unbal]:_) -> unbalanced unbal tower
+    where
+        grps = let cmp = compare `on` (`weightTower` tower)
+               in sortBy (compare `on` length) $
+                  groupBy (\x y -> cmp x y == EQ) $
+                  sortBy cmp (above prgm tower)
 
 part2 tower = (weight unbal tower) + error where
     unbal = fromJust $ unbalanced (bottomProgram tower) tower
