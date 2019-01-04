@@ -18,7 +18,7 @@ part2 n = length . group . sort . sets . unionFind n
 
 main = do
     input <- getContents
-    let records = lines $ filter (\x -> isDigit x || isSpace x) input
+    let records = lines $ filter ((||) <$> isDigit <*> isSpace) input
         n = length records
         pipes = concatMap (parsePipe . map read . words) records where
         parsePipe :: [Int] -> [(Int, Int)]
