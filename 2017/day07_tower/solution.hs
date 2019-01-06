@@ -48,15 +48,12 @@ unbalanced prgm tower = case grps of
                   sortBy cmp (above prgm tower)
 
 part2 tower = (weight unbal tower) + error where
-    unbal = fromJust $ unbalanced (bottomProgram tower) tower
-    bal = fromJust $ find ((/=) unbal) $
-          above (fromJust $ below unbal tower) tower
+    Just unbal = unbalanced (bottomProgram tower) tower
+    Just bal = find ((/=) unbal) $ above (fromJust $ below unbal tower) tower
     error = (weightTower bal tower) - (weightTower unbal tower)
 
-main :: IO ()
 main = do
-    input <- getContents
-    let tower = createTower input
+    tower <- fmap createTower getContents
 
     print $ part1 tower
     print $ part2 tower

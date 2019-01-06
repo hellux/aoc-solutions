@@ -3,10 +3,8 @@ import Data.List (find)
 {- spiraling sequence from given sequence [a,b,c,d..]:
  - [a,b,c,c,d,d,e,e,e,d,d,d...], where each value repeats 1 extra time every
  - other value -}
-spiralseq seq = concat $ zipWith f [0..] $ concatMap (replicate 2) [1..]
-                where f i x = replicate x (seq !! i)
-
-spiralcum seq = scanl (+) 0 $ spiralseq $ seq
+spiralseq seq = [1..] >>= \i -> replicate (div i 2 + mod i 2) (seq !! (i-1))
+spiralcum = scanl (+) 0 . spiralseq
 
 {-       x
  -    -1 0 1
@@ -38,10 +36,8 @@ square_value i = sum $ map square_value (adjacent i)
 square_values = map square_value [1..]
 part2 square = find (>square) square_values
 
-main :: IO ()
 main = do
-    input <- getLine
-    let square = read input :: Int
+    square <- fmap read getLine
 
     print $ part1 square
     print $ part2 square
