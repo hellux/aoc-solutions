@@ -1,8 +1,8 @@
-;;; Determine final floor by summing floor changes.
+;;; Determine final floor from list of floor changes.
 (defun part1 (floor-changes)
   (reduce '+ floor-changes))
 
-;;; Find floor-changes where floor -1 is reached first time.
+;;; Find floor change where floor -1 is reached for the first time.
 (defun part2 (floor-changes &optional (current-floor 0) (pos 0))
   (if (< current-floor 0)
     pos
@@ -12,9 +12,13 @@
              (+ pos 1))
       0)))
 
-;;; Turn instructions into to floor changes: "()()" -> (1 -1 1 -1).
+;;; Turn instructions into floor changes: "()()" -> (1 -1 1 -1).
 (defun parse (input)
-  (map 'list #'(lambda (c) (if (char= c #\() 1 -1)) input))
+  (defun char->change (c)
+    (cond ((char= c #\() 1)
+          ((char= c #\)) -1)
+          (t 0)))
+  (map 'list #'char->change input))
 
 (defun main ()
   (let ((floor-changes (parse (read-line))))
