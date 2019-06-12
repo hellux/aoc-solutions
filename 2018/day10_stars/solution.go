@@ -52,17 +52,17 @@ const MARGIN = 1.3
 
 func center(renderer *sdl.Renderer, points []pixel) (float64,
                                                      float64, float64) {
-    min := image.Point{-1, -1}
-    max := image.Point{-1, -1}
+    min := image.Point{points[0].pos.X, points[0].pos.Y}
+    max := image.Point{points[0].pos.X, points[0].pos.Y}
     for _, p := range points {
-        if min.X == -1 || p.pos.X < min.X {
+        if p.pos.X < min.X {
             min.X = p.pos.X
-        } else if max.X == -1 || p.pos.X > max.X {
+        } else if p.pos.X > max.X {
             max.X = p.pos.X
         }
-        if min.Y == -1 || p.pos.Y < min.Y {
+        if p.pos.Y < min.Y {
             min.Y = p.pos.Y
-        } else if max.Y == -1 || p.pos.Y > max.Y {
+        } else if p.pos.Y > max.Y {
             max.Y = p.pos.Y
         }
     }
@@ -79,13 +79,14 @@ func center(renderer *sdl.Renderer, points []pixel) (float64,
 func main() {
     bytes, _ := ioutil.ReadAll(os.Stdin)
     lines := strings.Split(string(bytes), "\n")
+    lines = lines[:len(lines)-1] // remove empty string
     n := len(lines)
 
     pixels := make([]pixel, n)
     for i, line := range lines {
         pos := image.Point{0, 0}
         vel := image.Point{0, 0}
-        fmt.Sscanf(line, "position=<%d,  %d> velocity=<%d, %d>",
+        fmt.Sscanf(line, "position=<%d,%d> velocity=<%d,%d>",
                    &pos.X, &pos.Y, &vel.X, &vel.Y)
         pixels[i] = pixel{pos, vel}
     }
@@ -133,7 +134,8 @@ func main() {
                     time -= time_speed
                     fmt.Println(time)
                 case "G":
-                    center_x, center_y, scale = center(renderer, pixels)
+                    center_x, center_y, scale =
+                        center(renderer, movePoints(pixels, time))
                 }
             }
         }
