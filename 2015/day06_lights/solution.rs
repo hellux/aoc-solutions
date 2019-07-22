@@ -2,9 +2,31 @@ use std::io;
 
 const WIDTH: usize = 1000;
 
-fn main() -> io::Result<()> {
-    let mut lights: [bool; WIDTH*WIDTH] = [false; WIDTH*WIDTH];
+enum InstrType {
+    TOGGLE,
+    ON,
+    OFF,
+}
 
+struct Instr {
+    instr: InstrType,
+    start: (i32, i32),
+    end: (i32, i32),
+}
+
+fn create_rect(instr: &Instr) -> Vec<(i32, i32)> {
+    let mut rectangle: Vec<(i32, i32)> = Vec::new();
+    let ((x1, y1), (x2, y2)) = (instr.start, instr.end);
+    for x in x1..x2+1 {
+        for y in y1..y2+1 {
+            rectangle.push((x, y));
+        }
+    }
+    rectangle
+}
+
+fn get_instructions() -> io::Result<Vec<Instr>> {
+    let mut instructions: Vec<Instr> = Vec::new();
     loop {
         let mut input = String::new();
         let len = io::stdin().read_line(&mut input)?;
@@ -12,56 +34,64 @@ fn main() -> io::Result<()> {
 
         let words: Vec<&str> = input.split_whitespace().collect();
         let c = words.len();
-        let instr = words.get(c-4);
+        let instr = match words.get(c-4) {
+            Some(&"toggle") => { InstrType::TOGGLE }
+            Some(&"on") => { InstrType::ON }
+            Some(&"off") => { InstrType::OFF }
+            _ => { InstrType::ON }
+        };
         let start: Vec<&str> = words.get(c-3).unwrap().split(',').collect();
         let end: Vec<&str> = words.get(c-1).unwrap().split(',').collect();
 
-        let x1: usize = start.get(0).unwrap().parse().unwrap();
-        let y1: usize = start.get(1).unwrap().parse().unwrap();
-        let x2: usize = end.get(0).unwrap().parse().unwrap();
-        let y2: usize = end.get(1).unwrap().parse().unwrap();
+        let x1: i32 = start.get(0).unwrap().parse().unwrap();
+        let y1: i32 = start.get(1).unwrap().parse().unwrap();
+        let x2: i32 = end.get(0).unwrap().parse().unwrap();
+        let y2: i32 = end.get(1).unwrap().parse().unwrap();
 
-        let mut rectangle: Vec<(usize,usize)> = Vec::new();
-        for x in x1..x2+1 {
-            for y in y1..y2+1 {
-                rectangle.push((x, y));
-            }
-        }
+        instructions.push(Instr {
+            instr: instr,
+            start: (x1, y1),
+            end: (x2, y2)
+        })
+    }
+    Ok(instructions)
+}
 
-        match instr {
-            Some(&"toggle") => {
-                for (x, y) in rectangle {
-                    let i: usize = x*WIDTH+y;
-                    lights[i] = match lights[i] {
-                        true => { false }
-                        false => { true }
-                    }
-
-                }
-            }
-            Some(&"on") => {
-                for (x, y) in rectangle {
-                    let i: usize = x*WIDTH+y;
-                    lights[i] = true;
-                }
-            }
-            Some(&"off") => {
-                for (x, y) in rectangle {
-                    let i: usize = x*WIDTH+y;
-                    lights[i] = false;
-                }
-            }
-            _ => {}
+fn part1(instructions: &Vec<Instr>) -> i32 {
+    let mut lights: [bool; WIDTH*WIDTH] = [false; WIDTH*WIDTH];
+    for instr in instructions {
+        let func: Box<Fn(bool)->bool> = match instr.instr {
+            InstrType::OFF => { Box::new(|_prev| false) }
+            InstrType::ON => { Box::new(|_prev| true) }
+            InstrType::TOGGLE => { Box::new(|prev| !prev) }
+        };
+        for (x, y) in create_rect(instr) {
+            let i: usize = (x as usize)*WIDTH+(y as usize);
+            lights[i] = func(lights[i]);
         }
     }
+    lights.iter().fold(0, |acc, l| if *l {acc+1} else {acc})
+}
 
-    let mut lit: i32 = 0;
-    for l in lights.iter() {
-        if *l {
-            lit += 1;
+fn part2(instructions: &Vec<Instr>) -> i32 {
+    let mut lights: [i32; WIDTH*WIDTH] = [0; WIDTH*WIDTH];
+    for instr in instructions {
+        let func: Box<Fn(i32)->i32> = match instr.instr {
+            InstrType::OFF => { Box::new(|prev| std::cmp::max(0, prev-1)) }
+            InstrType::ON => { Box::new(|prev| prev+1) }
+            InstrType::TOGGLE => { Box::new(|prev| prev+2) }
+        };
+        for (x, y) in create_rect(instr) {
+            let i: usize = (x as usize)*WIDTH+(y as usize);
+            lights[i] = func(lights[i]);
         }
     }
-    println!("part1: {}", lit);
+    lights.iter().sum()
+}
 
+fn main() -> io::Result<()> {
+    let instructions = get_instructions()?;
+    println!("part1: {}", part1(&instructions));
+    println!("part2: {}", part2(&instructions));
     Ok(())
 }
