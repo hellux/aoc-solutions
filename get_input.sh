@@ -1,7 +1,7 @@
 # usage: ./get_input.sh <year> <day>
 
 JAR="cookies.jar"
-[ -f "$JAR" ] || echo "no session cookie" && exit
+[ -f "$JAR" ] || (echo "no session cookie" && exit)
 
 year="$1"
 [ -z "$year" ] && exit 1
