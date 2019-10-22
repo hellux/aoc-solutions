@@ -10,17 +10,22 @@ n = 40000000
 aMultiplier = 16807
 bMultiplier = 48271
 
-lowN n = (.&.) (2^n-1)
 generator m prev = (prev*m) `rem` dividend
+generate n0 m = take n $ drop 1 $ iterate (generator m) n0
+
+lowN n = (.&.) (2^n-1)
 cmp = (==) `on` (lowN 16)
+countMatches as bs = length $ filter id $ zipWith cmp as bs
 
 part1 a b = do
-    let generate n0 m = take n $ drop 1 $ iterate (generator m) n0
     let as = generate a aMultiplier
     let bs = generate b bMultiplier
-    let matches = zipWith cmp as bs
-    let numMatching = length $ filter id matches
-    printf "Part 1: %d matching pairs\n" numMatching
+    printf "Part 1: %d matching pairs\n" (countMatches as bs)
+
+part2 a b = do
+    let as = filter ((==0) . (`rem` 4)) $ generate a aMultiplier
+    let bs = filter ((==0) . (`rem` 8)) $ generate b bMultiplier
+    printf "Part 2: %d matching pairs\n" (countMatches as bs)
 
 parse :: String -> (Int, Int)
 parse string = let [a, b] = (map (read . last . words) . lines) string
@@ -31,3 +36,4 @@ main = do
     let (a, b) = parse input
 
     part1 a b
+    part2 a b
