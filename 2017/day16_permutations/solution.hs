@@ -33,12 +33,24 @@ parse = map parseDance . words . map c2s where
     c2s ',' = ' '
     c2s c = c
 
-perform start = foldl (&) start . map dance
 startLine = take 16 ['a'..]
+perform start = foldl (&) start . map dance
 
 part1 = perform startLine
+
+danceCycle dances = startLine :
+                  ( takeWhile (/= startLine)
+                  $ tail
+                  $ iterate (`perform` dances) startLine
+                  )
+part2 dances = let c = danceCycle dances
+                   n = 1000000000
+                   l = length c
+               in c !! (n `mod` l)
 
 main = do
     input <- getContents
     let dances = parse input
+
     print $ part1 dances
+    print $ part2 dances
