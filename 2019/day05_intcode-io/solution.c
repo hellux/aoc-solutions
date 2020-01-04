@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define UNUSED(x) (void)(x)
+
 #define MAX_RAM 1000
 #define MAX_INPUT 10
 #define MAX_OUTPUT 100
@@ -13,9 +15,11 @@
 #define OP_MUL 2
 #define OP_LD  3
 #define OP_OUT 4
+#define OP_JNZ 5
+#define OP_JZ  6
+#define OP_LT  7
+#define OP_EQ  8
 #define OP_HLT 99
-
-#define UNUSED(x) (void)(x)
 
 struct instruction {
     int opcode;
@@ -59,6 +63,24 @@ void out(struct instruction instr, struct context *ctx) {
     ctx->output[ctx->op++] = instr.values[0];
 }
 
+void jnz(struct instruction instr, struct context *ctx) {
+    if (instr.values[0] != 0)
+        ctx->pc = instr.values[1];
+}
+
+void jz(struct instruction instr, struct context *ctx) {
+    if (instr.values[0] == 0)
+        ctx->pc = instr.values[1];
+}
+
+void lt(struct instruction instr, struct context *ctx) {
+    ctx->mem[instr.raws[2]] = instr.values[0] < instr.values[1];
+}
+
+void eq(struct instruction instr, struct context *ctx) {
+    ctx->mem[instr.raws[2]] = instr.values[0] == instr.values[1];
+}
+
 void hlt(struct instruction instr, struct context *ctx) {
     UNUSED(instr);
     ctx->halt = 1;
@@ -69,12 +91,20 @@ void initialize() {
     OPCODE_PARAM_COUNTS[OP_MUL] = 3;
     OPCODE_PARAM_COUNTS[OP_LD]  = 1;
     OPCODE_PARAM_COUNTS[OP_OUT] = 1;
+    OPCODE_PARAM_COUNTS[OP_JNZ] = 2;
+    OPCODE_PARAM_COUNTS[OP_JZ] = 2;
+    OPCODE_PARAM_COUNTS[OP_LT] = 3;
+    OPCODE_PARAM_COUNTS[OP_EQ] = 3;
 
     OP_FUNCS[OP_ADD] = add;
     OP_FUNCS[OP_MUL] = mul;
     OP_FUNCS[OP_LD]  = ld;
     OP_FUNCS[OP_OUT] = out;
     OP_FUNCS[OP_HLT] = hlt;
+    OP_FUNCS[OP_JNZ] = jnz;
+    OP_FUNCS[OP_JZ] = jz;
+    OP_FUNCS[OP_LT] = lt;
+    OP_FUNCS[OP_EQ] = eq;
 }
 
 void print_array(int *arr, int n) {
@@ -146,7 +176,9 @@ struct instruction get_instr(struct context *ctx) {
     return instr;
 }
 
-struct context execute(struct context ctx) {
+struct context execute(struct context ctx, int input) {
+    ctx.input[0] = input;
+
     while (!ctx.halt && ctx.pc < ctx.n) {
         struct instruction instr = get_instr(&ctx);
         OP_FUNCS[instr.opcode](instr, &ctx);
@@ -160,7 +192,6 @@ void init_context(struct context *ctx) {
     ctx->n = 0;
     ctx->pc = 0;
 
-    ctx->input[0] = 1;
     ctx->ip = 0;
 
     ctx->op = 0;
@@ -175,9 +206,11 @@ int main(void) {
     initialize();
     struct context ini;
     init_context(&ini);
-    struct context ctx = execute(ini);
+    struct context ctx1 = execute(ini, 1);
+    struct context ctx2 = execute(ini, 5);
 
-    printf("part1: %d\n", ctx.output[ctx.op-1]);
+    printf("part1: %d\n", ctx1.output[ctx1.op-1]);
+    printf("part2: %d\n", ctx2.output[ctx2.op-1]);
 
     return EXIT_SUCCESS;
 }
