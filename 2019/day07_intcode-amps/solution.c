@@ -22,28 +22,32 @@
 #define OP_EQ  8
 #define OP_HLT 99
 
+#define STATUS_HALT 0
+#define STATUS_RUN 1
+#define STATUS_WAIT 2
+
 #define AMP_COUNT 5
 
 struct instruction {
     int opcode;
     int n;
     int modes[MAX_PARAMS];
-    int values[MAX_PARAMS];
     int raws[MAX_PARAMS];
+    int values[MAX_PARAMS];
 };
 
 struct context {
-    int halt;
+    int status;
 
     int mem[MAX_RAM];
     int n;
     int pc;
 
-    int input[MAX_INPUT];
-    int ip;
+    int input;
+    int new_input;
 
-    int output[MAX_OUTPUT];
-    int op;
+    int output;
+    int new_output;
 };
 
 int OPCODE_PARAM_COUNTS[100] = {0};
@@ -58,12 +62,19 @@ void mul(struct instruction instr, struct context *ctx) {
 }
 
 void ld(struct instruction instr, struct context *ctx) {
-    int input = ctx->input[ctx->ip++];
-    ctx->mem[instr.raws[0]] = input;
+    if (ctx->new_input) {
+        ctx->mem[instr.raws[0]] = ctx->input;
+        ctx->new_input = 0;
+        ctx->status = STATUS_RUN;
+    } else {
+        ctx->status = STATUS_WAIT;
+        ctx->pc -= 1 + OPCODE_PARAM_COUNTS[OP_LD];
+    }
 }
 
 void out(struct instruction instr, struct context *ctx) {
-    ctx->output[ctx->op++] = instr.values[0];
+    ctx->output = instr.values[0];
+    ctx->new_output = 1;
 }
 
 void jnz(struct instruction instr, struct context *ctx) {
@@ -86,7 +97,7 @@ void eq(struct instruction instr, struct context *ctx) {
 
 void hlt(struct instruction instr, struct context *ctx) {
     UNUSED(instr);
-    ctx->halt = 1;
+    ctx->status = STATUS_HALT;
 }
 
 void initialize() {
@@ -110,10 +121,10 @@ void initialize() {
     OP_FUNCS[OP_EQ] = eq;
 }
 
-void print_array(int *arr, int n) {
+void print_array(int *arr, int n, int w) {
     /* print address bar */
-    int width = 10;
-    if (n < 10)
+    int width = w;
+    if (n < w)
         width = n;
     for (int i = 0; i < width; i++) {
         printf("%d\t", i);
@@ -122,7 +133,7 @@ void print_array(int *arr, int n) {
     /* print contents */
     printf("\n");
     for (int i = 0; i < n; i++) {
-        if (i > 0 && i % 10 == 0)
+        if (i > 0 && i % width == 0)
             printf("\n");
         printf("%d\t", arr[i]);
     }
@@ -131,16 +142,10 @@ void print_array(int *arr, int n) {
 
 void print_context(struct context *ctx) {
     printf("Memory:\n");
-    print_array(ctx->mem, ctx->n);
-
-    printf("\nInput:\n");
-    print_array(ctx->input, MAX_INPUT);
-
-    printf("\nOutput:\n");
-    print_array(ctx->output, ctx->op);
-
-    printf("\nhalt: %d, n: %d, pc: %d, ip: %d\n",
-           ctx->halt, ctx->n, ctx->pc, ctx->ip);
+    print_array(ctx->mem, ctx->n, 10);
+    printf("\nInput: %d, new: %d\n", ctx->input, ctx->new_input);
+    printf("\nOutput: %d, new: %d\n", ctx->output, ctx->new_output);
+    printf("\nstatus: %d, n: %d, pc: %d\n", ctx->status, ctx->n, ctx->pc);
 }
 
 struct instruction get_instr(struct context *ctx) {
@@ -179,29 +184,48 @@ struct instruction get_instr(struct context *ctx) {
     return instr;
 }
 
-int execute(struct context ctx, int phase, int input) {
-    ctx.input[0] = phase;
-    ctx.input[1] = input;
-
-    while (!ctx.halt && ctx.pc < ctx.n) {
-        struct instruction instr = get_instr(&ctx);
-        OP_FUNCS[instr.opcode](instr, &ctx);
+int tick(struct context *ctx) {
+    if (ctx->status != STATUS_HALT && ctx->pc < ctx->n) {
+        struct instruction instr = get_instr(ctx);
+        OP_FUNCS[instr.opcode](instr, ctx);
     }
 
-    return ctx.output[ctx.op-1];
+    return ctx->status;
+}
+
+void run_until_stop(struct context *ctx) {
+    while (tick(ctx) == STATUS_RUN);
+}
+
+void give(struct context *ctx, int input) {
+    if (ctx->new_input == 1)
+        printf("warning: overwriting unreceived input\n");
+    ctx->input = input;
+    ctx->new_input = 1;
+}
+
+int take(struct context *ctx) {
+    if (ctx->new_output == 0)
+        printf("warning: taking already used output\n");
+    ctx->new_output = 0;
+    return ctx->output;
 }
 
 void init_context(struct context *ctx) {
-    ctx->halt = 0;
-    ctx->n = 0;
-    ctx->pc = 0;
-    ctx->ip = 0;
-    ctx->op = 0;
+    ctx->status = STATUS_RUN;
 
     /* load program to initial memory */
+    ctx->n = 0;
     while (scanf("%d,", ctx->mem + ctx->n) == 1) {
         ctx->n++;
     }
+    ctx->pc = 0;
+
+    ctx->input = 0;
+    ctx->new_input = 0;
+
+    ctx->output = 0;
+    ctx->new_output = 0;
 }
 
 /*
@@ -234,7 +258,8 @@ void swap(int *x, int *y) {
 
 void permute(int *seq, int l, int r, int len, int *seqs, int *i) {
     if (l == r) {
-        int *dst = &seqs[len*((*i)++)];
+        int *dst = &seqs[*i*len];
+        *i += 1;
         for (int j = 0; j < len; j++)
             dst[j] = seq[j];
     } else {
@@ -256,15 +281,7 @@ int *permutations(int *seq, int length, int *n) {
     return seqs;
 }
 
-int run_sequence(struct context *ctx, int seq[]) {
-    int output = 0;
-    for (int i = 0; i < AMP_COUNT; i++) {
-        output = execute(*ctx, seq[i], output);
-    }
-    return output;
-}
-
-int find_max_signal(struct context ctx) {
+int part1(struct context ctx) {
     int seq[AMP_COUNT];
     for (int i = 0; i < AMP_COUNT; i++)
         seq[i] = i;
@@ -273,9 +290,62 @@ int find_max_signal(struct context ctx) {
     
     int max = 0;
     for (int i = 0; i < n; i++) {
-        int out = run_sequence(&ctx, perms+AMP_COUNT*i);
-        if (out > max) {
-            max = out;
+        int output = 0;
+
+        for (int j = 0; j < AMP_COUNT; j++) {
+            struct context amp = ctx;
+            int phase = perms[AMP_COUNT*i+j];
+
+            give(&amp, phase);
+            run_until_stop(&amp);
+
+            give(&amp, output);
+            run_until_stop(&amp);
+
+            output = take(&amp);
+        }
+
+        if (output > max) {
+            max = output;
+        }
+    }
+
+    return max;
+}
+
+int part2(struct context ctx) {
+    int seq[AMP_COUNT];
+    for (int i = 0; i < AMP_COUNT; i++)
+        seq[i] = i+AMP_COUNT;
+    int n;
+    int *perms = permutations(seq, AMP_COUNT, &n);
+
+    int max = 0;
+    for (int i = 0; i < n; i++) {
+        struct context amps[AMP_COUNT];
+        for (int j = 0; j < AMP_COUNT; j++) {
+            amps[j] = ctx;
+            int phase = perms[i*AMP_COUNT+j];
+            give(&amps[j], phase);
+            run_until_stop(&amps[j]);
+        }
+
+        int all_halted = 0;
+        int signals[AMP_COUNT] = {0};
+        while (!all_halted) {
+            all_halted = 1;
+            for (int j = 0; j < AMP_COUNT; j++) {
+                give(&amps[j], signals[j]);
+                run_until_stop(&amps[j]);
+                signals[(j+1)%AMP_COUNT] = take(&amps[j]);
+
+                if (amps[j].status != STATUS_HALT)
+                    all_halted = 0;
+            }
+        }
+
+        if (signals[0] > max) {
+            max = signals[0];
         }
     }
 
@@ -287,8 +357,8 @@ int main(void) {
     struct context ini;
     init_context(&ini);
 
-    int max_signal = find_max_signal(ini);
-    printf("part1: %d\n", max_signal);
+    printf("part1: %d\n", part1(ini));
+    printf("part2: %d\n", part2(ini));
 
     return EXIT_SUCCESS;
 }
