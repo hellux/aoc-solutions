@@ -5,8 +5,6 @@
 #define UNUSED(x) (void)(x)
 
 #define MAX_RAM 1000
-#define MAX_INPUT 2
-#define MAX_OUTPUT 10
 #define MAX_PARAMS 3
 
 #define POSITION_MODE 0
