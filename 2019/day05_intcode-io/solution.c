@@ -5,10 +5,13 @@
 
 integer run_system_id(struct context ctx, integer id) {
     give(&ctx, id);
-    while (run_until_stop(&ctx) != STATUS_HALT)
-        take(&ctx);
+
+    integer output = 0;
+    while (ctx.status != STATUS_HALT) {
+        output = take(&ctx);
+    }
     
-    return take(&ctx);
+    return output;
 }
 
 int main(void) {

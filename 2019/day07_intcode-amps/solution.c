@@ -74,11 +74,7 @@ integer part1(struct context ctx) {
             int phase = perms[AMP_COUNT*i+j];
 
             give(&amp, phase);
-            run_until_stop(&amp);
-
             give(&amp, output);
-            run_until_stop(&amp);
-
             output = take(&amp);
         }
 
@@ -104,7 +100,6 @@ integer part2(struct context ctx) {
             amps[j] = ctx;
             int phase = perms[i*AMP_COUNT+j];
             give(&amps[j], (integer) phase);
-            run_until_stop(&amps[j]);
         }
 
         int all_halted = 0;
@@ -113,7 +108,6 @@ integer part2(struct context ctx) {
             all_halted = 1;
             for (int j = 0; j < AMP_COUNT; j++) {
                 give(&amps[j], signals[j]);
-                run_until_stop(&amps[j]);
                 signals[(j+1)%AMP_COUNT] = take(&amps[j]);
 
                 if (amps[j].status != STATUS_HALT)

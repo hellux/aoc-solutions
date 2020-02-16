@@ -49,7 +49,7 @@ struct context {
     int new_input;
 
     integer output;
-    int new_output;
+    int output_taken;
 
     long cycles;
 };
@@ -77,13 +77,13 @@ void in(struct instruction instr, struct context *ctx) {
 }
 
 void out(struct instruction instr, struct context *ctx) {
-    if (ctx->new_output) {
-        ctx->pc -= 1 + OPCODE_PARAM_COUNTS[OP_OUT];
-        ctx->status = STATUS_WAIT_OUT;
+    if (ctx->output_taken) {
+        ctx->status = STATUS_RUN;
+        ctx->output_taken = 0;
     } else {
         ctx->output = instr.values[0];
-        ctx->new_output = 1;
-        ctx->status = STATUS_RUN;
+        ctx->status = STATUS_WAIT_OUT;
+        ctx->pc -= 1 + OPCODE_PARAM_COUNTS[OP_OUT];
     }
 }
 
@@ -165,7 +165,7 @@ void print_context(struct context *ctx) {
     printf("Memory:\n");
     print_array(ctx->mem, ctx->n, 10, (int) ctx->pc);
     printf("\nInput: %ld, new: %d\n", ctx->input, ctx->new_input);
-    printf("\nOutput: %ld, new: %d\n", ctx->output, ctx->new_output);
+    printf("\nOutput: %ld, taken: %d\n", ctx->output, ctx->output_taken);
     printf("\nstatus: %d, n: %d, pc: %ld, rb: %ld, cycles: %ld\n",
            ctx->status, ctx->n, ctx->pc, ctx->relative_base, ctx->cycles);
 }
@@ -233,6 +233,7 @@ int run_until_stop(struct context *ctx) {
 }
 
 void give(struct context *ctx, integer input) {
+    run_until_stop(ctx);
     if (ctx->new_input == 1)
         printf("warning: overwriting unreceived input %ld with %ld\n",
                ctx->input, input);
@@ -241,9 +242,10 @@ void give(struct context *ctx, integer input) {
 }
 
 integer take(struct context *ctx) {
-    if (ctx->new_output == 0)
-        printf("warning: taking already used output\n");
-    ctx->new_output = 0;
+    run_until_stop(ctx);
+    if (ctx->output_taken == 1)
+        printf("warning: taking already taken output\n");
+    ctx->output_taken = 1;
     return ctx->output;
 }
 
@@ -265,7 +267,7 @@ void init_context(struct context *ctx) {
     ctx->new_input = 0;
 
     ctx->output = 0;
-    ctx->new_output = 0;
+    ctx->output_taken = 0;
 
     ctx->cycles = 0;
 }
