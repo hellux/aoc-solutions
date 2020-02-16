@@ -163,7 +163,7 @@ struct instruction get_instr(struct context *ctx) {
         switch (mode) {
         case POSITION_MODE:
             value = ctx->mem[raw];
-            break;   
+            break;
         case IMMEDIATE_MODE:
             value = raw;
             break;
@@ -285,7 +285,7 @@ int part1(struct context ctx) {
         seq[i] = i;
     int n;
     int *perms = permutations(seq, AMP_COUNT, &n);
-    
+
     int max = 0;
     for (int i = 0; i < n; i++) {
         int output = 0;

@@ -19,7 +19,7 @@ walk = foldl step 0
 distance 0 = 0
 distance pos = 1 + distance next where
     next = minimumBy (compare `on` (realPart . abs)) $ map (step pos) [N .. NW]
-        
+
 part1 = distance . walk
 part2 = maximum . map distance . scanl step 0
 

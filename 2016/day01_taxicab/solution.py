@@ -14,7 +14,7 @@ def convert_input(puzzle_input):
 
 def travel(path, direction=0):
     """Calculate position after traveling a path.
-    
+
     Parameters:
         direction -- the current direction you are facing
         path -- a list of instructions you are following:
@@ -47,7 +47,7 @@ def travel_duplicate(path, direction=pi/2):
 
 def blocks_away(position):
     """Calculate how many blocks away you are.
-    
+
     Parameters:
         position -- a complex number indicating where you are
     """

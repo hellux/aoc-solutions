@@ -28,7 +28,7 @@ directions belt = full where
     unit (x, y) = let d = gcd x y in (div x d, div y d)
     uniques = nub $ sort $ map unit quad
     orientations (x, y) = [ (x, y), (-y, x), (-x, -y), (y, -x)]
-    full = concatMap orientations uniques 
+    full = concatMap orientations uniques
 
 move (dx, dy) (x, y) = (x+dx, y+dy)
 

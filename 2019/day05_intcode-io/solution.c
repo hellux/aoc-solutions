@@ -157,7 +157,7 @@ struct instruction get_instr(struct context *ctx) {
         switch (mode) {
         case POSITION_MODE:
             value = ctx->mem[raw];
-            break;   
+            break;
         case IMMEDIATE_MODE:
             value = raw;
             break;

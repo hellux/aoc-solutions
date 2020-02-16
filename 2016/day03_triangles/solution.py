@@ -1,7 +1,7 @@
 import sys
 
 def convert_input(puzzle_input):
-    return [[float(side) for side in triangle.split()] 
+    return [[float(side) for side in triangle.split()]
             for triangle in puzzle_input.split('\n')]
 
 

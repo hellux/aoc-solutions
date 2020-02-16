@@ -16,7 +16,7 @@ Node = namedtuple("Node", "visited distance")
 def dijkstra(start, end, seed):
     nodes = {start: Node(True, 0), end: Node(False, math.inf)}
     unvisited = [start, end]
-    
+
     while unvisited and not nodes[end].visited:
         unvisited.sort(reverse=True, key=lambda n: nodes[n].distance)
         current = unvisited.pop()
@@ -40,7 +40,7 @@ def dijkstra(start, end, seed):
 def explore(start, max_distance, seed):
     nodes = {start: Node(True, 0)}
     unvisited = [start]
-    
+
     visited = 0
     while unvisited:
         unvisited.sort(reverse=True, key=lambda n: nodes[n].distance)

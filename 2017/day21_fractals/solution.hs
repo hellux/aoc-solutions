@@ -21,16 +21,16 @@ parseRules = concatMap (parseRule . words) . lines
 chunksOf _ [] = []
 chunksOf n xs = (take n xs) : chunksOf n (drop n xs)
 reorder :: Int -> [a] -> [a]
-reorder n = concat . transpose . chunksOf n 
+reorder n = concat . transpose . chunksOf n
 
 divide :: Grid -> Squares
-divide ss = transpose 
+divide ss = transpose
           $ chunksOf w
           $ chunksOf n
           $ reorder w
           $ chunksOf n
           $ concat
-          $ ss where 
+          $ ss where
     s = length ss                       -- image width in pixels
     n = if s `mod` 2 == 0 then 2 else 3 -- square width
     w = s `div` n                       -- image width in squares

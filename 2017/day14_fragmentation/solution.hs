@@ -40,7 +40,7 @@ find uf k = case Map.lookup k uf of
                 Nothing -> k
                 Just next -> if next == k then k else find uf next
 union uf (k1, k2) = Map.insert root2 root2 $ Map.insert root1 root2 uf where
-    root1 = find uf k1 
+    root1 = find uf k1
     root2 = find uf k2
 sets uf = map ((find uf) . snd) $ Map.toList uf
 setCount = length . group . sort . sets

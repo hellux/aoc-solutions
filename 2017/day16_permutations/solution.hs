@@ -12,7 +12,7 @@ replace i c xs = let (bef, _:aft) = splitAt i xs
 
 spin n xs = let (bef, aft) = splitAt (length xs-n) xs
             in aft ++ bef
-            
+
 exchange i1 i2 xs = replace i1 (xs!!i2)
                   $ replace i2 (xs!!i1) xs
 

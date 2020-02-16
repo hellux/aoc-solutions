@@ -37,7 +37,7 @@ parseAction ls =
            , next = parseName (ls!!2)
            }
 
-parse (startLn:stepsLn:statesLns) = ( parseName startLn  
+parse (startLn:stepsLn:statesLns) = ( parseName startLn
                                     , parseSteps stepsLn
                                     , parseStates statesLns
                                     )
@@ -72,5 +72,5 @@ part1 states startState steps = checksum
 main = do
     input <- fmap lines getContents
     let (startState, steps, states) = parse input
-    
+
     print $ part1 states startState steps

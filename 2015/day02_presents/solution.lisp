@@ -43,7 +43,7 @@
             (let ((head (subseq str 0 next))
                   (tail (subseq str next)))
               (cons head (split-on delim tail)))))))
-        
+
 (defun parse-line (line)
   (map 'list #'parse-integer (split-on #\x line)))
 

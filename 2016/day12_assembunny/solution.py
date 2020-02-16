@@ -11,7 +11,7 @@ def parse_program(program):
 
 def eval_program(program, variables):
     pointer = 0
-    
+
     while pointer != len(program):
         statement = program[pointer]
         op = statement[0]
@@ -42,7 +42,7 @@ def part_one(program):
     variables = run_program(program, variables)
     print('Part one -- a:', variables['a'])
 
- 
+
 def part_two(program):
     variables = {var : 0 for var in 'abcd'}
     variables['c'] = 1

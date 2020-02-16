@@ -33,7 +33,7 @@
            (no-decrease-p (init num 1)))))
 
 (defun part1-compliant-p (num)
-  (and (double-digits-p num) 
+  (and (double-digits-p num)
        (no-decrease-p num)))
 
 (defun part1 (nums)

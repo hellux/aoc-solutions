@@ -2,7 +2,7 @@ from hashlib import md5
 
 from random import randint
 
-        
+
 def match_iterate_hex(seq_start, hex_start, index, animate):
     md5_sum = ''
     while md5_sum[:len(hex_start)] != hex_start:

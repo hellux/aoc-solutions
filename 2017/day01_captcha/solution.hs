@@ -13,7 +13,7 @@ part2 :: [Int] -> Int
 part2 xs = checksum (cycle xs) (length xs) ((length xs) `div` 2)
 
 main :: IO ()
-main = do 
+main = do
     input <- getLine
     let list = map digitToInt input
 

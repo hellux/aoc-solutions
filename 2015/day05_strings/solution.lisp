@@ -14,7 +14,7 @@
 
 (defun nicep (str)
   (and (three-vowels-p str)
-       (duplicate-letters-p str) 
+       (duplicate-letters-p str)
        (no-forbidden-strings-p str)))
 
 (defun part1 (dirs)

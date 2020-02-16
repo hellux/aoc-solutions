@@ -15,7 +15,7 @@ def follow_wire(wire):
             steps += 1
             if not pos in path:
                 path[pos] = steps
-    return path            
+    return path
 
 path1 = follow_wire(wire1)
 path2 = follow_wire(wire2)

@@ -182,7 +182,7 @@ struct instruction get_instr(struct context *ctx) {
         case POSITION_MODE:
             value = ctx->mem[raw];
             addr = raw;
-            break;   
+            break;
         case IMMEDIATE_MODE:
             value = raw;
             addr = ctx->pc-1;
