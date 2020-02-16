@@ -1,65 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAX_RAM 150
+#include "../intcode.h"
 
-struct context {
-    int mem[MAX_RAM];
-    int n;
-    int pc;
-};
-
-void add(struct context *ctx) {
-    int a = ctx->mem[ctx->pc++];
-    int b = ctx->mem[ctx->pc++];
-    int c = ctx->mem[ctx->pc++];
-    ctx->mem[c] = ctx->mem[a] + ctx->mem[b];
-}
-
-void multiply(struct context *ctx) {
-    int a = ctx->mem[ctx->pc++];
-    int b = ctx->mem[ctx->pc++];
-    int c = ctx->mem[ctx->pc++];
-    ctx->mem[c] = ctx->mem[a] * ctx->mem[b];
-}
-
-int execute(struct context ctx, int noun, int verb) {
+integer try_verb_noun(struct context ctx, integer noun, integer verb) {
     /* set noun and verb */
     ctx.mem[1] = noun;
     ctx.mem[2] = verb;
 
-    /* execute program */
-    int quit = 0;
-    while (!quit && ctx.pc < ctx.n) {
-        int instr = ctx.mem[ctx.pc++];
-        switch (instr) {
-        case 1: add(&ctx); break;
-        case 2: multiply(&ctx); break;
-        case 99: quit=1; break;
-        }
-    }
+    run_until_stop(&ctx);
 
     return ctx.mem[0];
 }
 
-void init_context(struct context *ctx) {
-    ctx->n = 0;
-    ctx->pc = 0;
-
-    /* load program to initial memory */
-    while (scanf("%d,", ctx->mem + ctx->n) == 1) {
-        ctx->n++;
-    }
+integer part1(struct context *ctx) {
+    return try_verb_noun(*ctx, 12, 2);
 }
 
-int part1(struct context *ctx) {
-    return execute(*ctx, 12, 2);
-}
-
-int part2(struct context *ctx) {
-    for (int noun = 0; noun <= 99; noun++) {
-        for (int verb = 0; verb <= 99; verb++) {
-            if (execute(*ctx, noun, verb) == 19690720)
+integer part2(struct context *ctx) {
+    for (integer noun = 0; noun <= 99; noun++) {
+        for (integer verb = 0; verb <= 99; verb++) {
+            if (try_verb_noun(*ctx, noun, verb) == 19690720)
                 return noun*100 + verb;
         }
     }
@@ -69,10 +30,9 @@ int part2(struct context *ctx) {
 int main(void) {
     struct context ini;
     init_context(&ini);
-    printf("n: %d\n", ini.n);
 
-    printf("part1: %d\n", part1(&ini));
-    printf("part2: %d\n", part2(&ini));
+    printf("part1: %ld\n", part1(&ini));
+    printf("part2: %ld\n", part2(&ini));
 
     return EXIT_SUCCESS;
 }
