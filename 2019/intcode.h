@@ -176,6 +176,13 @@ struct instruction get_instr(struct context *ctx) {
     /* instr code */
     int code = (int) ctx->mem[ctx->pc++];
     instr.opcode = code % 100;
+
+    if (!((0 <= instr.opcode && instr.opcode <= OP_REL)
+          || instr.opcode == 99)) {
+        fprintf(stderr, "invalid instr opcode %d\n", instr.opcode);
+        exit(EXIT_FAILURE);
+    }
+
     instr.n = OPCODE_PARAM_COUNTS[instr.opcode];
 
     /* parameters */
