@@ -93,11 +93,22 @@ void run_robot(int hull[][HULL_WIDTH], struct robot *robot) {
     }
 }
 
-void show_hull(int hull[][HULL_WIDTH],
-               int xstart, int ystart, int xend, int yend) {
-    FOR_EACH_PANEL(xstart, ystart, xend, yend) {
+void show_hull(int hull[][HULL_WIDTH]) {
+    /* find bounding box of painted panels */
+    int xmin = HULL_WIDTH;  int xmax = 0;
+    int ymin = HULL_HEIGHT; int ymax = 0;
+    FOR_EACH_PANEL(0, 0, HULL_WIDTH-1, HULL_HEIGHT-1) {
+        if (get_color(x, y, hull) == WHITE) {
+            if (x < xmin) xmin = x;
+            if (x > xmax) xmax = x;
+            if (y < ymin) ymin = y;
+            if (y > ymax) ymax = y;
+        }
+    }
+
+    FOR_EACH_PANEL(xmin, ymin, xmax, ymax) {
         printf("%s", get_color(x, y, hull) == 1 ? "█" : " ");
-        if (x == xend)
+        if (x == xmax)
             printf("\n");
     }
 }
@@ -116,26 +127,13 @@ int part1(struct robot robot) {
 }
 
 void part2(struct robot robot) {
-    /* paint hull */
     int hull[HULL_HEIGHT][HULL_WIDTH];
     init_hull(hull);
+
     paint(robot.x, robot.y, WHITE, hull);
     run_robot(hull, &robot);
 
-    /* find bounding box of text */
-    int xmin = HULL_WIDTH;  int xmax = 0;
-    int ymin = HULL_HEIGHT; int ymax = 0;
-    FOR_EACH_PANEL(0, 0, HULL_WIDTH-1, HULL_HEIGHT-1) {
-        if (get_color(x, y, hull) == WHITE) {
-            if (x < xmin) xmin = x;
-            if (x > xmax) xmax = x;
-            if (y < ymin) ymin = y;
-            if (y > ymax) ymax = y;
-        }
-    }
-
-    /* display text within box */
-    show_hull(hull, xmin, ymin, xmax, ymax);
+    show_hull(hull);
 }
 
 int main (void) {
