@@ -21,8 +21,11 @@
 #define STATUS_WAIT_IN 2
 #define STATUS_WAIT_OUT 3
 
-#define MAX_RAM 100000
 #define MAX_PARAMS 3
+
+#ifndef MAX_RAM
+#define MAX_RAM 100000
+#endif
 
 #define UNUSED(x) (void)(x)
 
