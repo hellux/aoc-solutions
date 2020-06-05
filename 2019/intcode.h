@@ -244,6 +244,8 @@ int run_until_stop(struct context *ctx) {
 
 void give(struct context *ctx, integer input) {
     run_until_stop(ctx);
+    if (ctx->status == STATUS_HALT)
+        printf("warning: trying to give to halted machine\n");
     if (ctx->new_input == 1)
         printf("warning: overwriting unreceived input %ld with %ld\n",
                ctx->input, input);
