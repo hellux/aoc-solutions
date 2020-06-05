@@ -74,15 +74,13 @@ int part2(struct context *initial, map m) {
         }
     }
 
-    int i = 0;
-    while (i++ < 10000000) {
-        int xdr = 0, ydr = 0;
+    int xdr = 0, ydr = 0;
+    while (xdr < P2_SIZE || ydr < P2_SIZE) {
+        xdr = 0;
+        ydr = 0;
 
         while (status(x+1+xdr++, y, m, *initial) == PULLING);
         while (status(x, y+1+ydr++, m, *initial) == PULLING);
-
-        if (xdr >= P2_SIZE && ydr >= P2_SIZE)
-            break;
         
         if (xdr < P2_SIZE) {
             y++;
