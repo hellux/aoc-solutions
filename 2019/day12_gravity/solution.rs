@@ -2,10 +2,12 @@ use std::io;
 
 const DIM: usize = 3;
 
-#[derive(Debug)]
+type Vector = [i64; DIM];
+
+#[derive(Debug, Clone)]
 struct Moon {
-    pos: [i64; DIM],
-    vel: [i64; DIM],
+    pos: Vector,
+    vel: Vector,
 }
 
 fn get_moons() -> io::Result<Vec<Moon>> {
@@ -54,20 +56,64 @@ fn step(ms: &mut Vec<Moon>) {
 }
 
 fn energy(m: &Moon) -> i64 {
-    let potential = m.pos.iter().map(|d| d.abs()).sum::<i64>();
-    let kinetic = m.vel.iter().map(|d| d.abs()).sum::<i64>();
-    potential * kinetic
+    let abs_sum = |xs: Vector| xs.iter().map(|d| d.abs()).sum::<i64>();
+    abs_sum(m.pos) * abs_sum(m.vel)
 }
 
-fn part1(mut ms: Vec<Moon>) -> i64 {
+fn part1(init: &Vec<Moon>) -> i64 {
+    let mut ms = init.clone();
     for _ in 0..1000 { step(&mut ms); }
     ms.iter().map(energy).sum::<i64>()
+}
+
+fn gcd(a: i64, b: i64) -> i64 {
+    if a < b { gcd(a, b-a) }
+    else if b < a { gcd(a-b, b) }
+    else { a }
+}
+
+fn lcm(a: i64, b: i64) -> i64 {
+    a * b / gcd(a, b)
+}
+
+fn part2(init: &Vec<Moon>) -> i64 {
+    let n = init.len();
+    let mut ms = init.clone();
+
+    let mut steps: Vector = [0, 0, 0];
+
+    let mut s = 0;
+    loop {
+        step(&mut ms);
+        s += 1;
+
+        let mut finished = true;
+        for d in 0..DIM {
+            if steps[d] == 0 {
+                let mut eq = true;
+                for i in 0..n {
+                    if ms[i].pos[d] != init[i].pos[d] ||
+                       ms[i].vel[d] != init[i].vel[d] {
+                        eq = false;
+                        break;
+                    }
+                }
+                if eq { steps[d] = s; }
+                else { finished = false; }
+            }
+        }
+
+        if finished { break };
+    }
+
+    lcm(steps[0], lcm(steps[1], steps[2]))
 }
 
 fn main() -> io::Result<()> {
     let moons = get_moons()?;
 
-    println!("{}", part1(moons));
+    println!("{}", part1(&moons));
+    println!("{}", part2(&moons));
 
     Ok(())
 }
