@@ -89,14 +89,25 @@ fn get_circuit() -> io::Result<Circuit> {
     Ok(circuit)
 }
 
-fn part1(circuit: &mut Circuit) -> SignalStrength {
-    eval_wire("a", circuit)
+fn part1(circuit: &Circuit) -> SignalStrength {
+    let mut c = circuit.clone();
+    eval_wire("a", &mut c)
+}
+
+fn part2(circuit: &Circuit, a_signal: SignalStrength) -> SignalStrength {
+    let mut c = circuit.clone();
+
+    c.insert("b".to_string(), Gate::Direct(Signal::Constant(a_signal)));
+
+    eval_wire("a", &mut c)
 }
 
 fn main() -> io::Result<()> {
-    let mut circuit = get_circuit()?;
+    let circuit = get_circuit()?;
 
-    println!("{:?}", part1(&mut circuit));
+    let p1 = part1(&circuit);
+    let p2 = part2(&circuit, p1);
+    println!("{}\n{}", p1, p2);
 
     Ok(())
 }
