@@ -245,30 +245,37 @@ int run_until_stop(struct context *ctx) {
 void give(struct context *ctx, integer input) {
     run_until_stop(ctx);
     if (ctx->status == STATUS_HALT)
-        printf("warning: trying to give to halted machine\n");
+        fprintf(stderr, "warning: trying to give to halted machine\n");
     if (ctx->new_input == 1)
-        printf("warning: overwriting unreceived input %ld with %ld\n",
+        fprintf(stderr, "warning: overwriting unreceived input %ld with %ld\n",
                ctx->input, input);
     ctx->input = input;
     ctx->new_input = 1;
 }
 
+void give_string(struct context *ctx, const char *str) {
+    size_t i = 0;
+    while (str[i] != '\0') {
+        give(ctx, (integer) str[i++]);
+    }
+}
+
 integer take(struct context *ctx) {
     run_until_stop(ctx);
     if (ctx->output_taken == 1)
-        printf("warning: taking already taken output\n");
+        fprintf(stderr, "warning: taking already taken output\n");
     ctx->output_taken = 1;
     return ctx->output;
 }
 
-void init_context(struct context *ctx) {
+void init_context_f(struct context *ctx, FILE *f) {
     initialize();
 
     ctx->status = STATUS_RUN;
 
     /* load program to initial memory */
     ctx->n = 0;
-    while (scanf("%ld,", ctx->mem + ctx->n) == 1) {
+    while (fscanf(f, "%ld,", ctx->mem + ctx->n) == 1) {
         ctx->n++;
     }
     ctx->pc = 0;
@@ -282,4 +289,8 @@ void init_context(struct context *ctx) {
     ctx->output_taken = 0;
 
     ctx->cycles = 0;
+}
+
+void init_context(struct context *ctx) {
+    init_context_f(ctx, stdin);
 }
