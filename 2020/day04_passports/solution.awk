@@ -21,15 +21,6 @@ function validate_passport() {
         part2 += 1
 }
 
-{
-    if (NF > 0) { # store each field
-        for (i = 1; i <= NF; ++i) {
-            split($i, kv, ":")
-            p[kv[1]] = kv[2]
-        }
-    } else { # end of passport
-        validate_passport()
-        delete p;
-    }
-}
+NF > 0 { for (i = 1; i <= NF; ++i) { split($i, kv, ":"); p[kv[1]] = kv[2] } }
+NF == 0 { validate_passport(); delete p }
 END { validate_passport(); print part1 "\n" part2 }
