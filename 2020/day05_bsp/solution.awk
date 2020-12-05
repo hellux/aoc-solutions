@@ -10,7 +10,7 @@ BEGIN { part1 = 0 }
     if (id > part1) part1 = id
 }
 END {
-    for (id = 1; id <= 2^10; ++id)
+    for (id = 1; id < part1; ++id)
         if (!(id in ids) && id-1 in ids && id+1 in ids)
             part2 = id
 
