@@ -1,4 +1,4 @@
-import Data.List.Split (splitOn)
+import Data.List (elemIndex, find)
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Maybe
@@ -10,13 +10,18 @@ type Rules = Map Bag Inside
 
 myBag = "shiny gold"
 
+splitOnComma x = case elemIndex ',' x of
+    Nothing -> [x]
+    Just i -> let (y, ys) = splitAt i x
+              in y : splitOnComma (drop 1 ys)
+
 parseRule :: [String] -> Rule
 parseRule (col1:col2:"bags":"contain":inside) =
     (unwords [col1, col2], parseBags (unwords inside))
     where
     parseBag [count, col1, col2, _] = Just (read count, unwords [col1, col2])
     parseBag _ = Nothing
-    parseBags = mapMaybe (parseBag . words) . splitOn ","
+    parseBags = mapMaybe (parseBag . words) . splitOnComma
 
 canContain :: Rules -> Bag -> Bag -> Bool
 canContain rules inner outer =
