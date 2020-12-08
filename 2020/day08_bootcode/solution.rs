@@ -1,12 +1,12 @@
 use self::InstrKind::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum InstrKind {
     Nop,
     Acc,
     Jmp,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Instr {
     kind: InstrKind,
     arg: i64,
@@ -44,27 +44,60 @@ fn read_program() -> Program {
     prog
 }
 
-fn part1(prog: Program) -> i64 {
-    let mut run: Vec<bool> = vec![false; prog.len()];
+fn run(prog: &Program) -> (i64, bool) {
+    let n = prog.len();
+
+    let mut run: Vec<bool> = vec![false; n];
     let mut pc = 0;
     let mut acc = 0;
 
-    while !run[pc] {
+    while pc < n && !run[pc] {
+        run[pc] = true;
+
         let instr = &prog[pc];
         match instr.kind {
             Nop => {}
             Acc => acc += instr.arg,
             Jmp => pc = (pc as i64 + instr.arg - 1) as usize,
         }
-        run[pc] = true;
+
         pc += 1;
     }
 
-    acc
+    (acc, pc < n)
+}
+
+fn part1(prog: &Program) -> i64 {
+    run(prog).0
+}
+
+fn part2(prog: &Program) -> i64 {
+    let mut prog = prog.clone();
+
+    for i in 0..prog.len() {
+        let prev = prog[i].kind;
+        let new = match prev {
+            Nop => Jmp,
+            Jmp => Nop,
+            Acc => Acc,
+        };
+
+        if new != prev {
+            prog[i].kind = new;
+            let (acc, infinite) = run(&prog);
+            if !infinite {
+                return acc;
+            }
+            prog[i].kind = prev;
+        }
+    }
+
+    -1
 }
 
 fn main() {
     let prog = read_program();
 
-    println!("{}", part1(prog));
+    println!("{}", part1(&prog));
+    println!("{}", part2(&prog));
 }
