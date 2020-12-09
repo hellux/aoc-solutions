@@ -25,9 +25,25 @@
   (find-invalid (subseq numbers 0 *preamble-size*)
                 (subseq numbers *preamble-size*)))
 
+(defun find-sum (current remaining target)
+  (let ((sum (reduce '+ current)))
+    (cond ((= sum target) current)
+          ((> sum target) (find-sum (subseq current 0 (- (length current) 1))
+                                    remaining
+                                    target))
+          ((< sum target) (find-sum (cons (car remaining) current)
+                                    (cdr remaining)
+                                    target)))))
+
+(defun part2 (numbers inv)
+  (let ((seq (find-sum '() numbers inv)))
+    (+ (reduce #'min seq) (reduce #'max seq))))
+
 (defun get-lines ()
   (loop for l = (read-line *standard-input* nil) until (null l) collecting l))
 
 (defun main ()
-  (let ((numbers (map 'list #'parse-integer (get-lines))))
-    (format t "~d~%" (part1 numbers))))
+  (let* ((numbers (map 'list #'parse-integer (get-lines)))
+         (p1 (part1 numbers))
+         (p2 (part2 numbers p1)))
+    (format t "~d~%~d~%" p1 p2)))
