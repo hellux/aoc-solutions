@@ -1,0 +1,16 @@
+(defun part1 (nums)
+  (let* ((rating (+ (reduce #'max nums) 3))
+         (lower (cons 0 nums))
+         (higher (concatenate 'list nums (list rating)))
+         (diffs (mapcar #'- higher lower))
+         (diffsum (reduce #'+ diffs))
+         (threes (/ (- diffsum (length diffs)) 2))
+         (ones (- (length diffs) threes)))
+    (* ones threes)))
+
+(defun get-lines ()
+  (loop for l = (read-line *standard-input* nil) until (null l) collecting l))
+
+(defun main ()
+  (let* ((numbers (sort (map 'list #'parse-integer (get-lines)) #'<)))
+    (format t "~d~%" (part1 numbers))))
