@@ -1,5 +1,3 @@
-use std::fmt;
-
 use self::Square::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -49,17 +47,9 @@ impl Layout {
         }
     }
 
-    fn get(&self, x: i16, y: i16) -> Option<Square> {
-        let index = y * self.width as i16 + x;
-        if index >= 0 {
-            self.squares.get(index as usize).map(|s| *s)
-        } else {
-            None
-        }
-    }
-
-    fn tick(&mut self) -> bool {
+    fn tick(&mut self, p2: bool) -> bool {
         let n = self.width * self.height;
+        let tol = if p2 { 5 } else { 4 };
 
         let ds = [
             (-1, -1),
@@ -71,19 +61,35 @@ impl Layout {
             (0, 1),
             (1, 1),
         ];
-        let mut adjs = vec![0; n];
+        let mut vis = vec![0; n];
         for y in 0..self.height {
             for x in 0..self.width {
-                if self.squares[y * self.width + x] == Occupied {
-                    for (dx, dy) in &ds {
-                        let nx = x as i16 + dx;
-                        let ny = y as i16 + dy;
-                        if 0 <= nx
+                for (dx, dy) in &ds {
+                    for i in 1.. {
+                        let nx = x as i16 + dx * i;
+                        let ny = y as i16 + dy * i;
+                        let inside = 0 <= nx
                             && nx < self.width as i16
                             && 0 <= ny
-                            && ny < self.height as i16
-                        {
-                            adjs[ny as usize * self.width + nx as usize] += 1;
+                            && ny < self.height as i16;
+
+                        if !inside {
+                            break;
+                        } else {
+                            match self.squares
+                                [ny as usize * self.width + nx as usize]
+                            {
+                                Occupied => {
+                                    vis[y * self.width + x] += 1;
+                                    break;
+                                }
+                                Empty => break,
+                                Floor => {}
+                            }
+                        }
+
+                        if !p2 {
+                            break;
                         }
                     }
                 }
@@ -92,16 +98,16 @@ impl Layout {
 
         let mut changed = false;
         for i in 0..n {
-            let adjacent = adjs[i];
+            let visible = vis[i];
             match self.squares[i] {
                 Empty => {
-                    if adjacent == 0 {
+                    if visible == 0 {
                         self.squares[i] = Occupied;
                         changed = true;
                     }
                 }
                 Occupied => {
-                    if adjacent >= 4 {
+                    if visible >= tol {
                         self.squares[i] = Empty;
                         changed = true;
                     }
@@ -117,6 +123,20 @@ impl Layout {
         self.squares.iter().filter(|s| s == &&sq).count()
     }
 }
+
+/*
+impl Layout {
+    fn get(&self, x: i16, y: i16) -> Option<Square> {
+        let index = y * self.width as i16 + x;
+        if index >= 0 {
+            self.squares.get(index as usize).map(|s| *s)
+        } else {
+            None
+        }
+    }
+}
+
+use std::fmt;
 
 impl fmt::Display for Square {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -144,9 +164,15 @@ impl fmt::Display for Layout {
         Ok(())
     }
 }
+*/
 
 fn part1(mut layout: Layout) -> usize {
-    while layout.tick() {}
+    while layout.tick(false) {}
+    layout.count(Occupied)
+}
+
+fn part2(mut layout: Layout) -> usize {
+    while layout.tick(true) {}
     layout.count(Occupied)
 }
 
@@ -154,4 +180,5 @@ fn main() {
     let layout = Layout::new();
 
     println!("{}", part1(layout.clone()));
+    println!("{}", part2(layout.clone()));
 }
