@@ -46,7 +46,43 @@ int part1() {
 }
 
 int part2() {
-    return 0;
+    int x = 0;
+    int y = 0;
+    int wx = 10;
+    int wy = 1;
+
+    for (int i = 0; i < n; i++) {
+        int l = instr[i].len;
+        int dw = -1;
+        int rot = 0;
+        switch (instr[i].dir) {
+            case 'E': dw = 0; break;
+            case 'S': dw = 1; break;
+            case 'W': dw = 2; break;
+            case 'N': dw = 3; break;
+            case 'F': x += l * wx; y += l * wy; break;
+            case 'R': rot = l/90; break;
+            case 'L': rot = (-l/90 + 4) % 4; break;
+        }
+
+        if (dw >= 0) {
+            wx += l * DIRS[dw][0];
+            wy += l * DIRS[dw][1];
+        } else {
+            for (int r = 0; r < rot; r++) {
+                int xp = wx; int yp = wy;
+                if ((wx >= 0 && wy >= 0) || (wx < 0 && wy >= 0)) {
+                    wx = yp;
+                    wy = -xp;
+                } else {
+                    wx = yp;
+                    wy = -xp;
+                }
+            }
+        }
+    }
+
+    return abs(x) + abs(y);
 }
 
 int main() {
