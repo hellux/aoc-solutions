@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-fn part1(starting: &[u64]) -> u64 {
+fn spoken_number(starting: &[u64], turn: usize) -> u64 {
     let mut spoken: HashMap<u64, usize> = starting
         .iter()
         .take(starting.len() - 1) // skip last one
@@ -9,7 +9,7 @@ fn part1(starting: &[u64]) -> u64 {
         .collect();
 
     let mut prev = *starting.last().unwrap();
-    for i in (starting.len())..2020 {
+    for i in (starting.len())..turn {
         let next = spoken.get(&prev).map(|last| i - last).unwrap_or(0) as u64;
         spoken.insert(prev, i);
         prev = next;
@@ -27,5 +27,9 @@ fn main() {
         .map(|c| c.parse().unwrap())
         .collect();
 
-    println!("{}", part1(&starting_numbers));
+    println!(
+        "{}\n{}",
+        spoken_number(&starting_numbers, 2020),
+        spoken_number(&starting_numbers, 30_000_000)
+    );
 }
