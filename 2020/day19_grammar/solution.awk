@@ -1,16 +1,17 @@
-function create_rule_regex(i, _rule_parts) {
-    split(rules[i], _rule_parts, " ")
+function create_rule_regex(i, _rule_parts, _full_rule, _r) {
+    split(rules[i], _rule_parts)
 
-    full_rule = ""
-    for (r in _rule_parts) {
-        rule = _rule_parts[r]
-        if (rule ~ /[0-9]+/)
-            full_rule = full_rule "(" create_rule_regex(rule) ")"
-        else
-            full_rule = full_rule rule
+    _full_rule = ""
+    for (_r = 1; _r <= length(_rule_parts); _r++) {
+        rule = _rule_parts[_r]
+        if (rule ~ /[0-9]+/) {
+            _full_rule = _full_rule "(" create_rule_regex(rule) ")"
+        } else {
+            _full_rule = _full_rule rule
+        }
     }
 
-    return full_rule
+    return _full_rule
 }
 
 $1 ~ /[0-9]+:/ {
@@ -34,7 +35,7 @@ $0 == "" {
     }
     rule0p2 = "^" create_rule_regex(0) "$";
 }
-$1 ~ /[ab]+/ {
+$0 ~ /[ab]+/ {
     if ($1 ~ rule0p1) { part1 += 1 }
     if ($1 ~ rule0p2) { part2 += 1 }
 }
