@@ -2,30 +2,36 @@
 #include <stdlib.h>
 
 struct stream {
-    char c[80];
+    char c[15000];
     int i;
 };
 
-long eval_stream(struct stream *s);
+typedef int precedence[256];
 
-long eval_atom(struct stream *s) {
+long eval_stream(struct stream *s, precedence p, int bp) {
+    long lhs;
     char c = s->c[s->i++];
     switch (c) {
         case '(':
-            return eval_stream(s);
+            lhs = eval_stream(s, p, 0);
+            break;
         default:
-            return c - '0';
+            lhs = c - '0';
     }
-}
-
-long eval_stream(struct stream *s) {
-    long lhs = eval_atom(s);
 
     while (1) {
-        char c = s->c[s->i++];
-        if (c == ')' || c == '\0') break;
+        char c = s->c[s->i];
+        int lbp = p[(int)c];
 
-        long rhs = eval_atom(s);
+        if (lbp < bp)
+            break;
+
+        s->i++;
+
+        if (c == ')' || c == '\0')
+            break;
+
+        long rhs = eval_stream(s, p, lbp + 1);
         switch (c) {
             case '+': lhs += rhs; break;
             case '*': lhs *= rhs; break;
@@ -36,35 +42,41 @@ long eval_stream(struct stream *s) {
     return lhs;
 }
 
-long part1(struct stream *streams, int n) {
-    long sum = 0;
+long part1(struct stream s) {
+    precedence p = {0};
+    p['+'] = 1;
+    p['*'] = 1;
+    return eval_stream(&s, p, 0);
+}
 
-    for (int i = 0; i < n; i++) {
-        sum += eval_stream(streams+i);
-    }
-
-    return sum;
+long part2(struct stream s) {
+    precedence p = {0};
+    p['+'] = 2;
+    p['*'] = 1;
+    return eval_stream(&s, p, 0);
 }
 
 int main() {
-    struct stream streams[400] = {0};
-    int n = 0;
+    struct stream s = {"(", 0};
 
     char c;
-    int ic = 0;
+    int n = 1;
     while ((c = (char)getchar()) && c != EOF) {
         switch (c) {
             case ' ': continue;
             case '\n':
-                streams[n++].c[ic] = '\0';
-                ic = 0;
+                s.c[n++] = ')';
+                s.c[n++] = '+';
+                s.c[n++] = '(';
                 break;
             default:
-                streams[n].c[ic++] = c;
+                s.c[n++] = c;
         }
     }
+    s.c[n-2] = '\0';
 
-    printf("%ld\n", part1(streams, n));
+    printf("%ld\n", part1(s));
+    printf("%ld\n", part2(s));
 
     return EXIT_SUCCESS;
 }
