@@ -1,13 +1,7 @@
 import sys
 
-
-def run_program(program, variables):
-    return eval_program(parse_program(program), variables)
-
-
 def parse_program(program):
-    return [statement.split() for statement in program.split('\n')]
-
+    return [statement.split() for statement in program.split('\n')[:-1]]
 
 def eval_program(program, variables):
     pointer = 0
@@ -34,23 +28,18 @@ def eval_program(program, variables):
                     continue
         pointer += 1
 
-    return variables
+    return variables['a']
 
-
-def part_one(program):
+def part1(program):
     variables = {var : 0 for var in 'abcd'}
-    variables = run_program(program, variables)
-    print('Part one -- a:', variables['a'])
+    return eval_program(program, variables)
 
-
-def part_two(program):
+def part2(program):
     variables = {var : 0 for var in 'abcd'}
     variables['c'] = 1
-    variables = run_program(program, variables)
-    print('Part two -- a:', variables['a'])
-
+    return eval_program(program, variables)
 
 if __name__ == '__main__':
-    program = sys.stdin.read()
-    part_one(program)
-    part_two(program)
+    program = parse_program(sys.stdin.read())
+    print(part1(program))
+    print(part2(program))

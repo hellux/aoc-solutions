@@ -62,11 +62,11 @@ def find_shortest_path(goal, seed, start=(1, 1), previous=tuple()):
             return None
 
 
-def part_one(seed):
+def part1(seed):
     print('Part one -- Shortest path length:',
           find_shortest_path((31, 39), seed))
 
 
 if __name__ == '__main__':
     seed = int(input())
-    part_one(seed)
+    part1(seed)

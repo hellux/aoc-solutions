@@ -2,11 +2,6 @@ import sys
 from collections import namedtuple
 import re
 
-
-def convert_input(puzzle_input):
-    return puzzle_input.split('\n')
-
-
 def parse_address_seqs(address):
     seqs, hyp_seqs = [], []
 
@@ -22,43 +17,35 @@ def parse_address_seqs(address):
 
     return seqs, hyp_seqs
 
-
 def contains_pattern(pattern_test, seq):
     if not seq:
         return False
     else:
         return pattern_test(seq) or contains_pattern(pattern_test, seq[1:])
 
-
 def any_contains(pattern_test, seqs):
     return any([contains_pattern(pattern_test, seq) for seq in seqs])
-
 
 def is_abba(seq):
     return len(seq) >= 4 and \
            seq[0] != seq[1] and \
            seq[:2] == seq[3:1:-1]
 
-
 def is_aba(seq):
     return len(seq) >= 3 and \
            seq[0] != seq[1] and \
            seq[:3] == seq[2::-1]
 
-
 def corresponding_bab(aba):
     return aba[1] + aba[0] + aba[1]
 
-
 def has_corresponding_bab(aba, hyp_seqs):
     return any_contains(lambda seq: seq[:3] == corresponding_bab(aba), hyp_seqs)
-
 
 def supports_tls(address):
     seqs, hyp_seqs = parse_address_seqs(address)
     return any_contains(is_abba, seqs) and \
        not any_contains(is_abba, hyp_seqs)
-
 
 def find_patterns(pattern_test, seq):
     if not seq:
@@ -67,7 +54,6 @@ def find_patterns(pattern_test, seq):
         return [seq] + find_patterns(pattern_test, seq[1:])
     else:
         return find_patterns(pattern_test, seq[1:])
-
 
 def supports_ssl(seqs, hyp_seqs):
     if not seqs:
@@ -80,27 +66,26 @@ def supports_ssl(seqs, hyp_seqs):
             return supports_ssl(seqs[1:], hyp_seqs)
 
 
-
-def part_one(addresses):
+def part1(addresses):
     support_count = 0
     for address in addresses:
         if supports_tls(address):
             support_count += 1
 
-    print('Part one -- TLS IPs:', support_count)
+    return support_count
 
 
-def part_two(addresses):
+def part2(addresses):
     support_count = 0
     for address in addresses:
         seqs, hyp_seqs = parse_address_seqs(address)
         if supports_ssl(seqs, hyp_seqs):
             support_count += 1
 
-    print('Part two -- SSL IPs:', support_count)
+    return support_count
 
 
 if __name__ == '__main__':
-    addresses = convert_input(sys.stdin.read())
-    part_one(addresses)
-    part_two(addresses)
+    addresses = sys.stdin.read().split('\n')
+    print(part1(addresses))
+    print(part2(addresses))

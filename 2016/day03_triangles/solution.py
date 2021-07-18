@@ -2,8 +2,7 @@ import sys
 
 def convert_input(puzzle_input):
     return [[float(side) for side in triangle.split()]
-            for triangle in puzzle_input.split('\n')]
-
+            for triangle in puzzle_input.split('\n')][:-1]
 
 def quicksort(seq):
     if len(seq) <= 1: return seq
@@ -20,7 +19,6 @@ def quicksort(seq):
 
     return quicksort(lesser) + equal + quicksort(greater)
 
-
 def is_triangle(sides):
     a, b, c = quicksort(sides)
     return a + b > c
@@ -28,21 +26,17 @@ def is_triangle(sides):
 def count_triangles(triangles):
     return len(list(filter(is_triangle, triangles)))
 
+def part1(triangles): return count_triangles(triangles)
 
-def part_one(triangles):
-    print('Part one -- Triangles:', count_triangles(triangles))
-
-
-def part_two(triangles):
+def part2(triangles):
     triangles_new = []
     triangles = [list(zip(*triangles[i:i+3])) for i in range(0, len(triangles), 3)]
     for triple in triangles:
         for triangle in triple:
             triangles_new.append(triangle)
-    print('Part two -- Triangles:', count_triangles(triangles_new))
-
+    return count_triangles(triangles_new)
 
 if __name__ == '__main__':
     triangles = convert_input(sys.stdin.read())
-    part_one(triangles)
-    part_two(triangles)
+    print(part1(triangles))
+    print(part2(triangles))
