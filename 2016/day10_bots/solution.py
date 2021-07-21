@@ -1,21 +1,17 @@
 import sys
 
-def find_start_count(instructions):
-    bots = []
-
-    start = 0
+def bot_count(instructions):
     top = 0
     for instr in instructions:
         tokens = instr.split()
-        if len(tokens) == 6 and tokens[0] == 'value':
-            bot = int(tokens[5])
-            if bot in bots:
-                start = bot
-            else:
-                bots.append(bot)
-            top = max(top, bot)
+        if tokens[0] == 'bot':
+            top = max(int(tokens[1]), top)
+        if tokens[5] == 'bot':
+            top = max(int(tokens[6]), top)
+        if len(tokens) == 12 and tokens[10] == 'bot':
+            top = max(int(tokens[11]), top)
 
-    return start, top+1
+    return top+1
 
 def find_dealers(instructions, bot):
     dealers = []
@@ -35,16 +31,8 @@ def find_dealers(instructions, bot):
     return dealers
 
 def simulate(instructions):
-    bots = {}
-    outputs = {}
-
-    start, count = find_start_count(instructions)
-
-    def has_values(bot):
-        return bot in bots and len(bots[bot]) == 2
-
     def get_value(bot, high_low=0):
-        if not has_values(bot):
+        if bot not in bots or len(bots[bot]) < 2:
             dealers = find_dealers(instructions, bot)
             values = []
             for d in dealers:
@@ -54,23 +42,38 @@ def simulate(instructions):
                     values.append(d)
                 else:
                     raise ValueError('Invalid dealer!')
-            low = min(values)
-            high = max(values)
-            bots[bot] = (low, high)
+            bots[bot] = (min(values), max(values))
 
         return bots[bot][high_low]
 
-    for bot in range(count):
+    bots = {}
+    for bot in range(bot_count(instructions)):
         get_value(bot)
 
-    return bots
+    outputs = []
+    for o in [0, 1, 2]:
+        for instr in instructions:
+            tokens = instr.split()
+            if tokens[0] == 'bot':
+                bot = bots[int(tokens[1])]
+                if tokens[5] == 'output' and tokens[6] == str(o):
+                    outputs.append(bot[0])
+                elif tokens[10] == 'output' and tokens[11] == str(o):
+                    outputs.append(bot[1])
+
+    return bots, outputs
 
 def part1(bots):
     for bot, values in bots.items():
         if values == (17, 61):
             return bot
 
+def part2(outputs):
+    return outputs[0] * outputs[1] * outputs[2]
+
 if __name__ == '__main__':
     instructions = sys.stdin.read().split('\n')[:-1]
-    bots = simulate(instructions)
+    bots, outputs = simulate(instructions)
+
     print(part1(bots))
+    print(part2(outputs))
