@@ -1,5 +1,4 @@
 from collections import namedtuple
-import heapq
 import math
 
 def is_open(pos, seed):
@@ -52,7 +51,7 @@ def explore(start, max_distance, seed):
         for option in ((0, 1), (0, -1), (1, 0), (-1, 0)):
             neighbour = (current[0]+option[0], current[1]+option[1])
             if is_open(neighbour, seed):
-                if not neighbour in nodes:
+                if neighbour not in nodes:
                     new_node = Node(False, math.inf)
                     nodes[neighbour] = new_node
                     unvisited.append(neighbour)
@@ -66,16 +65,10 @@ def explore(start, max_distance, seed):
 
     return visited
 
-
-def part_one(seed):
-    return dijkstra((1, 1), (31, 39), seed)
-
-
-def part_two(seed):
-    return explore((1, 1), 50, seed)
-
+def part1(seed): return dijkstra((1, 1), (31, 39), seed)
+def part2(seed): return explore((1, 1), 50, seed)
 
 if __name__ == '__main__':
     seed = int(input())
-    print(part_one(seed))
-    print(part_two(seed))
+    print(part1(seed))
+    print(part2(seed))

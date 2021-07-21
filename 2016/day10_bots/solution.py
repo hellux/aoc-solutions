@@ -1,9 +1,5 @@
 import sys
 
-def convert_input(puzzle_input):
-    return puzzle_input.split('\n')
-
-
 def find_start_count(instructions):
     bots = []
 
@@ -21,28 +17,24 @@ def find_start_count(instructions):
 
     return start, top+1
 
-
 def find_dealers(instructions, bot):
     dealers = []
     for instr in instructions:
         tokens = instr.split()
         if tokens[-1] == str(bot) and tokens[-2] == 'bot' or \
            (len(tokens) > 7 and tokens[6] == str(bot) and tokens[5] == 'bot'):
-            print(instr, bot)
             if tokens[0] == 'value':
                 dealers.append(int(tokens[1]))
             elif tokens[0] == 'bot':
                 hl_str = tokens[tokens.index(str(bot))-3]
-                high_low = HIGH if hl_str == 'high' else LOW
+                high_low = 1 if hl_str == 'high' else 0
                 dealers.append((tokens[1], high_low))
             else:
                 raise ValueError('Invalid instr')
     assert len(dealers) == 2, dealers
     return dealers
 
-
 def simulate(instructions):
-
     bots = {}
     outputs = {}
 
@@ -73,17 +65,12 @@ def simulate(instructions):
 
     return bots
 
-
-def part_one(bots):
+def part1(bots):
     for bot, values in bots.items():
         if values == (17, 61):
-            print(bot)
-
+            return bot
 
 if __name__ == '__main__':
-    LOW = 0
-    HIGH = 1
-
-    instructions = convert_input(sys.stdin.read())
+    instructions = sys.stdin.read().split('\n')[:-1]
     bots = simulate(instructions)
-    part_one(bots)
+    print(part1(bots))
