@@ -24,10 +24,27 @@ function winner(aa, bb) {
     if (aa == "C" && bb == "X") return 1
     if (aa == "C" && bb == "Y") return -1
 }
+function play(aa, cc) {
+    if (aa == "A" && cc == "X") return "Z"
+    if (aa == "B" && cc == "X") return "X"
+    if (aa == "C" && cc == "X") return "Y"
+
+    if (aa == "A" && cc == "Y") return "X"
+    if (aa == "B" && cc == "Y") return "Y"
+    if (aa == "C" && cc == "Y") return "Z"
+
+    if (aa == "A" && cc == "Z") return "Y"
+    if (aa == "B" && cc == "Z") return "Z"
+    if (aa == "C" && cc == "Z") return "X"
+
+    return "E"
+}
 BEGIN { FS = " " }
 {
     part1+=score($1, $2)
+    part2+=score($1, play($1, $2))
 }
 END {
     print part1
+    print part2
 }
