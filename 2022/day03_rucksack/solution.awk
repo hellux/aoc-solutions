@@ -12,8 +12,24 @@ BEGIN {
             break
         }
     }
+
+    i++
+    g[i]=$0
+    if (i == 3) {
+        for (p = 1; p <= length(alpha); p++) {
+            a=substr(alpha, p, 1)
+            if (index(g[1], a) > 0 && \
+                index(g[2], a) > 0 && \
+                index(g[3], a) > 0) {
+                part2+=p
+                break
+            }
+        }
+        i=0
+    }
 }
 
 END {
     print part1
+    print part2
 }
