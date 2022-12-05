@@ -27,15 +27,25 @@ function revert(x) {
         }
     }
 
+    l=substr(s2[from], length(s2[from])-n+1, n)
+    if (l != "") {
+        s2[from]=substr(s2[from], 1, length(s2[from])-n)
+        s2[to]=s2[to] l
+    }
+
     next
 }
 /^$/ {
     for (i = 1; i <= N; i++) {
         s[i] = revert(s[i])
+        s2[i] = s[i]
     }
 }
 
 END {
     for (i = 1; i <= N; i++) printf "%s", substr(s[i], length(s[i]), 1)
+    print ""
+
+    for (i = 1; i <= N; i++) printf "%s", substr(s2[i], length(s2[i]), 1)
     print ""
 }
