@@ -5,6 +5,9 @@ BEGIN { FS=" " }
     for (i = 3; i <= NF; i++) {
         items[m, i-2] = $i+0
         ic[m] += 1
+
+        items_copy[m, i-2] = $i+0
+        ic_copy[m] += 1
     }
 }
 /Operation/ { op[m] = $5; right[m] = $6 }
@@ -22,7 +25,8 @@ function rounds(R) {
                 if (op[m] == "+") new=lhs+rhs
                 else if (op[m] == "*") new=lhs*rhs
 
-                new=int(new/3)
+                if (lcd) new=new%lcd
+                else new=int(new/3)
 
                 if (new % div[m] == 0) receiver=true[m]
                 else receiver=false[m]
@@ -43,4 +47,14 @@ END {
     part1="sort -n | tail -n2 | awk 'BEGIN {x=1} {x=x*$0} END {print x}'"
     for (m = 0; m <= M; m++) print inspect[m] | part1
     close(part1)
+
+    # restore
+    delete inspect
+    delete items; for (i in items_copy) items[i]=items_copy[i]
+    delete ic; for (i in ic_copy) ic[i]=ic_copy[i]
+
+    lcd=1; for (m = 0; m <= M; m++) lcd*=div[m]
+    rounds(10000)
+    part2=part1 " "
+    for (m = 0; m <= M; m++) print inspect[m] | part2
 }
