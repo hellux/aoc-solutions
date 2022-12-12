@@ -14,7 +14,7 @@ BEGIN {
     }
 }
 
-function distances(start) {
+function distances(start, reverse) {
     delete unvis; delete dist
     for (n in h) { unvis[n]=1; dist[n]=inf }
     dist[start]=0
@@ -30,6 +30,7 @@ function distances(start) {
             if (nn < 1 || nn > N) continue
             if (!nn in unvis) continue
             hd=h[nn]-h[cn]
+            if (reverse) hd=-hd
             if (hd > 1) continue
             else d=dist[cn]+1
             if (dist[nn] > d) dist[nn]=d
@@ -42,4 +43,9 @@ function distances(start) {
 END {
     distances(sn)
     print dist[en]
+
+    distances(en, 1)
+    part2=inf
+    for (n in h) if (h[n]==1 && dist[n]<part2) part2=dist[n]
+    print part2
 }
