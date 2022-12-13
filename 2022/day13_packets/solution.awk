@@ -26,8 +26,11 @@ function cmp(l, r) {
 
 {
     if (cmp($1, $2)) part1+=NR
+    for (f=1; f<=2; f++) if (cmp($f, "[[2]]")) pos0+=1
+    for (f=1; f<=2; f++) if (cmp($f, "[[6]]")) pos1+=1
 }
 
 END {
     print part1
+    print (pos0+1) * (pos1+2)
 }
