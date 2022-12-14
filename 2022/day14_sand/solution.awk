@@ -35,6 +35,7 @@ function fall() {
                     x+=1; y+=1 # right
                 } else {
                     w[x,y]=2
+                    if (y==SY) return n
                     break
                 }
             }
@@ -46,4 +47,11 @@ function fall() {
 END {
     y_abyss=wmax
     print fall()-1
+
+    for (i in w) if (w[i]==2) delete w[i] # remove part1 sand
+
+    y_floor=wmax+2
+    for (x=SX-y_floor; x<=SX+y_floor; x++) w[x,wmax+2]=1 # add floor
+    y_abyss=y_floor+1 # unreachable
+    print fall()
 }
