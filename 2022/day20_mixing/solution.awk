@@ -6,7 +6,7 @@ function mix() {
     for (i=0; i<N; i++) {
         for (j=0; j<N; j++) if (ns[j]==i) { p=j; break }
         n=ns[p]
-        v=vs[n]
+        v=vs[n]%(N-1)
 
         if (v<0) {
             for (j=1; j<=-v; j++) {
@@ -33,5 +33,14 @@ function coords() {
 
 END {
     mix()
+    print coords()
+
+    # reset / apply key
+    for (i=0; i<N; i++) {
+        ns[i]=i
+        vs[i]=vs[i]*811589153
+    }
+
+    for (m=1; m<=10; m++) mix()
     print coords()
 }
