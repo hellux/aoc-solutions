@@ -18,6 +18,12 @@ yell n ms = case ms M.! n of
 
 part1 = yell "root"
 
+part2 ms0 = head $ filter human [0..] where
+    human i = let ms = M.insert "humn" (Yell i) ms0
+                  Wait lhs rhs _ = ms M.! "root"
+              in yell lhs ms == yell rhs ms
+
 main = do
     monkeys <- fmap parseMonkeys getContents
     print $ part1 monkeys
+    print $ part2 monkeys
