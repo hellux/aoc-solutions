@@ -16,7 +16,11 @@ fn _draw(elves: &[(isize, isize)]) {
     println!();
 }
 
-fn sim(elves: &mut [(isize, isize)], proposals: &mut Vec<(usize, (isize, isize))>, r: usize) {
+fn sim(
+    elves: &mut [(isize, isize)],
+    proposals: &mut Vec<(usize, (isize, isize))>,
+    r: usize,
+) -> bool {
     const DIRS: [((isize, isize), [(isize, isize); 3]); 4] = [
         ((00, -1), [(-1, -1), (00, -1), (01, -1)]), // north
         ((00, 01), [(-1, 01), (00, 01), (01, 01)]), // south
@@ -45,11 +49,15 @@ fn sim(elves: &mut [(isize, isize)], proposals: &mut Vec<(usize, (isize, isize))
         }
     }
 
+    let mut moved = false;
     for (i, pos) in proposals.iter() {
         if proposals.iter().filter(|(_, p)| p == pos).count() == 1 {
             elves[*i] = *pos;
+            moved = true;
         }
     }
+
+    moved
 }
 
 fn bbox(elves: &[(isize, isize)]) -> ((isize, isize), (isize, isize)) {
@@ -76,6 +84,17 @@ fn part1(elves: &[(isize, isize)]) -> isize {
     (xmax - xmin + 1) * (ymax - ymin + 1) - n as isize
 }
 
+fn part2(elves: &[(isize, isize)]) -> usize {
+    let mut elves = elves.to_vec();
+    let n = elves.len();
+    let mut proposals = Vec::with_capacity(n);
+    let mut r = 0;
+    while sim(&mut elves, &mut proposals, r) {
+        r += 1
+    }
+    r + 1
+}
+
 fn main() {
     let elves = {
         let mut input = String::new();
@@ -91,4 +110,5 @@ fn main() {
             .collect::<Vec<_>>()
     };
     println!("{}", part1(&elves));
+    println!("{}", part2(&elves));
 }
