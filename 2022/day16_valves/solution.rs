@@ -62,24 +62,57 @@ fn max_pressure(
         return 0;
     }
 
-    let mut max = 0;
-    for dst in (0..valves.len()).filter(|i| !open.borrow()[*i]) {
-        let r = (distances[pos][dst] + 1).min(rounds);
-        let remaining = rounds - r;
-        let provided_pressure = valves[dst].0 * remaining;
+    (0..valves.len())
+        .filter(|i| !open.borrow()[*i])
+        .map(|dst| {
+            let r = (distances[pos][dst] + 1).min(rounds);
+            let remaining = rounds - r;
+            let provided_pressure = valves[dst].0 * remaining;
 
-        open.borrow_mut()[dst] = true;
-        let p = provided_pressure + max_pressure(dst, remaining, open, valves, distances);
-        open.borrow_mut()[dst] = false;
+            open.borrow_mut()[dst] = true;
+            let p = provided_pressure + max_pressure(dst, remaining, open, valves, distances);
+            open.borrow_mut()[dst] = false;
 
-        max = max.max(p);
-    }
-    max
+            p
+        })
+        .max()
+        .unwrap_or(0)
 }
 
 fn part1(valves: &[(usize, Vec<usize>)], start: usize, distances: &[Vec<usize>]) -> usize {
     let mut open = valves.iter().map(|(r, _)| *r == 0).collect::<Vec<_>>();
     max_pressure(start, 30, &RefCell::new(&mut open), valves, distances)
+}
+
+fn part2(valves: &[(usize, Vec<usize>)], start: usize, distances: &[Vec<usize>]) -> usize {
+    const R: usize = 26;
+    const D: usize = 2;
+
+    let n = valves.len();
+    let nonzero = (0..n).filter(|i| valves[*i].0 > 0).collect::<Vec<_>>();
+    let nz = nonzero.len();
+    assert!(nz <= 16);
+    let lb = nz / 2 - D;
+    let ub = nz / 2 + D;
+
+    let mut max = 0;
+    let mut open0 = vec![true; n];
+    let mut open1 = vec![true; n];
+    for mask in 0..(1u16 << nz) {
+        let n1 = mask.count_ones() as usize;
+        if lb < n1 && n1 < ub {
+            for b in 0..nz {
+                let a = mask & (1 << b) > 0;
+                let i = nonzero[b];
+                open0[i] = a;
+                open1[i] = !a;
+            }
+            let p0 = max_pressure(start, R, &RefCell::new(&mut open0), valves, distances);
+            let p1 = max_pressure(start, R, &RefCell::new(&mut open1), valves, distances);
+            max = max.max(p0 + p1);
+        }
+    }
+    max
 }
 
 fn main() {
@@ -93,4 +126,5 @@ fn main() {
         .collect::<Vec<_>>();
 
     println!("{}", part1(&valves, start, &distances));
+    println!("{}", part2(&valves, start, &distances));
 }
