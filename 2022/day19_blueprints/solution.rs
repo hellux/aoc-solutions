@@ -72,7 +72,19 @@ fn part1(bps: &[Blueprint]) -> T {
         .sum()
 }
 
+fn part2(bps: &[Blueprint]) -> T {
+    bps.iter()
+        .take(3)
+        .map(|bp| {
+            let mut best = 0;
+            dfs(32, FLEET_INIT, STOCK_INIT, bp, &mut best);
+            best
+        })
+        .product()
+}
+
 fn main() {
     let blueprints = get_input();
     println!("{}", part1(&blueprints));
+    println!("{}", part2(&blueprints));
 }
