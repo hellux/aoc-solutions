@@ -2,13 +2,18 @@ use std::io::Read;
 
 type Blizzards<'a> = (&'a [Vec<char>], isize, isize);
 
-fn closest_path(start: (isize, isize), end: (isize, isize), (bs, w, h): Blizzards) -> isize {
+fn closest_path(
+    m: isize,
+    start: (isize, isize),
+    end: (isize, isize),
+    (bs, w, h): Blizzards,
+) -> isize {
     let (mut branches, mut next) = (
         std::collections::HashSet::new(),
         std::collections::HashSet::new(),
     ); // use set to avoid duplicating same pos, exploding no. of branches
 
-    for m in 0.. {
+    for m in m.. {
         if branches.is_empty() {
             branches.insert(start);
         }
@@ -36,7 +41,18 @@ fn closest_path(start: (isize, isize), end: (isize, isize), (bs, w, h): Blizzard
 
 fn part1(blizzards: Blizzards) -> isize {
     let (_, w, h) = blizzards;
-    closest_path((0, -1), (w - 1, h), blizzards)
+    closest_path(0, (0, -1), (w - 1, h), blizzards)
+}
+
+fn part2(blizzards: Blizzards) -> isize {
+    let (_, w, h) = blizzards;
+    let start = (0, -1);
+    let end = (w - 1, h);
+    let m = 0;
+    let m = closest_path(m, start, end, blizzards);
+    let m = closest_path(m, end, start, blizzards);
+    let m = closest_path(m, start, end, blizzards);
+    m
 }
 
 fn main() {
@@ -56,4 +72,5 @@ fn main() {
     let blizzards = (blizzards.as_slice(), w, h);
 
     println!("{}", part1(blizzards));
+    println!("{}", part2(blizzards));
 }
