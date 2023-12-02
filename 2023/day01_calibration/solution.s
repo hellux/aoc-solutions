@@ -17,6 +17,11 @@ main:
     add %rax,%r13                       # r13 <- end of input
 
     mov %rsp,%r12                       # start of input
+    mov $0,%r15                         # ignore spelled digits
+    call calibration_values
+
+    mov %rsp,%r12                       # start of input
+    mov $1,%r15                         # handle spelled digits
     call calibration_values
 
     mov $0, %rax
@@ -49,6 +54,47 @@ eol:
     jmp new_line
 continue_char:
 
+    cmp $1,%r15
+    jne break_check_spelled
+
+    # check for spelled out digits
+    mov $digits,%r11                    # r11: current digit ptr
+check_spelled_digit:
+    mov %r12,%r10                       # r10: current src ptr
+    sub $1,%r10
+check_spelled_char:
+    cmp %r10,%r13
+    je next_digit                       # eof
+
+    mov (%r11),%dl                      # dl <- current digit char
+    add $1,%r11
+
+    cmp $0,%dl
+    jne continue_digit_char
+    sub $digits,%r11
+    shr $3,%r11
+    mov %r11b,%sil
+    add $1,%sil
+    jmp save_digit
+continue_digit_char:
+
+    mov (%r10),%cl                      # cl <- current src char
+    add $1,%r10
+
+    cmp %cl,%dl
+    je check_spelled_char
+
+next_digit:
+    # go to next digit, aligned by 8
+    and $0xf8,%r11b
+    add $0x8,%r11
+
+    cmp $digits_end,%r11
+    je break_check_spelled
+
+    jmp check_spelled_digit
+break_check_spelled:
+
     # skip non-digits
     cmp $0x31,%sil
     jl next_char
@@ -74,3 +120,16 @@ eof:
 
 fmt:
     .asciz "%u\n"
+
+.align 8
+digits:
+    .ascii "one\0    "
+    .ascii "two\0    "
+    .ascii "three\0  "
+    .ascii "four\0   "
+    .ascii "five\0   "
+    .ascii "six\0    "
+    .ascii "seven\0  "
+    .ascii "eight\0  "
+    .ascii "nine\0   "
+digits_end:
