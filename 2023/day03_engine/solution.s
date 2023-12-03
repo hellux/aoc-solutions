@@ -26,6 +26,10 @@ schematic_width:
     jne schematic_width
     sub %r12,%r14                       # r14 <- row length
 
+    # put gear ratios array on stack: struct {size_t gear_pos; size_t num;} arr[1000];
+    sub $0x4000,%rsp
+    mov %rsp,%r15                       # r15 <- gear arr ptr
+
     call part_numbers
 
     mov $0, %rax
@@ -33,6 +37,7 @@ schematic_width:
     ret
 
 part_numbers:
+    push %r15                           # start of gear array
     mov %r12,%r8                        # r8: current ptr
     mov $0,%rbx                         # rbx: current char
     mov $0,%r9                          # r9 <- part number sum
@@ -81,11 +86,54 @@ end_of_num:
     cmp $0,%r11
     je next_char
     add %rax,%r9
+    cmp $2,%r11
+    jne next_char
+    # push gear pos / part num to arr
+    mov %r10,(%r15)
+    mov %rax,0x8(%r15)
+    add $0x10,%r15
     jmp next_char
 
 eof:
+    pop %r14                            # start of gear arr
+
+    mov $0,%r11                         # r11: sum of gear ratios
+next_gear:
+    cmp %r14,%r15
+    je break_gear
+
+    mov (%r14),%rcx                     # rcx: current gear pos
+    mov 8(%r14),%rax                    # rax: current gear ratio product
+    add $16,%r14
+    cmp $0,%rcx
+    je next_gear                        # skip if cleared
+    mov $1,%r12                         # r12 <- part num count
+
+    mov %r14,%r13
+next_num:
+    cmp %r13,%r15
+    jne continue_num
+finish_gear:
+    cmp $2,%r12
+    jne next_gear
+    add %rax,%r11
+    jmp next_gear
+continue_num:
+    mov (%r13),%rdx                     # rdx <- current pos
+    add $16,%r13
+    cmp %rcx,%rdx
+    jne next_num
+
+    movq $0,-16(%r13)                   # clear so we dont check same gear again
+    mov -8(%r13),%rsi
+    imul %rsi,%rax                      # gear ratio *= part num
+    add $1,%r12                         # part num count += 1
+    jmp next_num
+break_gear:
+
     lea fmt(%rip),%rdi
     mov %r9d,%esi
+    mov %r11d,%edx
     xor %eax,%eax                       # no vec varargs
     call printf
     ret
@@ -165,6 +213,10 @@ is_symbol:
 
 not_digit:
     mov $1,%r11
+    cmp $0x2a,%dl                       # '*'
+    jne not_symbol
+    mov $2,%r11
+    mov %rcx,%r10
 
 not_symbol:
     ret
@@ -172,4 +224,4 @@ not_symbol:
     .section .rodata
 
 fmt:
-    .asciz "%u\n"
+    .asciz "%u\n%u\n"
