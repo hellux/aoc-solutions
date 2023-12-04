@@ -8,7 +8,10 @@ use strings;
 
 export fn main() void = {
 	let in = bufio::newscanner(os::stdin, types::SIZE_MAX);
+	let copies: [256]int = [1...];
+	let i = 0;
 	let part1 = 0;
+	let part2 = 0;
 	for (true) {
 		match (bufio::scan_line(&in)) {
 		case let line: const str =>
@@ -35,10 +38,16 @@ export fn main() void = {
 				yield 1 << (matches-1);
 			};
 			part1 += score;
+			for (let j = 0; j < matches; j += 1) {
+				copies[i+1+j] += copies[i];
+			};
+			part2 += copies[i];
 		case io::EOF =>
 			break;
 		};
+		i += 1;
 	};
 
 	fmt::println(part1)!;
+	fmt::println(part2)!;
 };
