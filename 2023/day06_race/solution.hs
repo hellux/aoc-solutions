@@ -20,6 +20,10 @@ race = (\(l,u) -> u-l+1) . bounds
 
 part1 = product . map race
 
+part2 input = race (t, d) where
+    [t, d] = map (read . concatMap show) $ transpose $ map (\(x,y) -> [x,y]) input
+
 main = do
     input <- fmap parseInput getContents
     print $ part1 input
+    print $ part2 input
