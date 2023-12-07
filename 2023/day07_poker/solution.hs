@@ -1,4 +1,4 @@
-import Data.List (sort, sortOn, group)
+import Data.List (sort, sortOn, group, elemIndex)
 import Data.Char (digitToInt)
 
 parseInput = map parseLine . filter (not . null) . lines where
@@ -10,7 +10,13 @@ parseInput = map parseLine . filter (not . null) . lines where
     t 'A' = 14
     t c = digitToInt c
 
-kind = t . distr where
+kind x = case elemIndex 1 x of
+    Just i -> maximum $ map (kind . \y -> pre ++ y : post) nonJokers where
+        (pre, _:post) = splitAt i x
+        nonJokers = [2..10] ++ [12..14]
+    Nothing -> kindPlain x
+
+kindPlain = t . distr where
     distr = reverse . sortOn snd . map (\x -> (head x, length x)) . group . sort
     t ((a, 5):_)        = 6 -- five of a kind
     t ((a, 4):_)        = 5 -- four of a kind
@@ -25,6 +31,12 @@ key x = (kind x, value x)
 
 part1 = sum . zipWith (\rank (_, bid) -> bid * rank) [1..] . sortOn (key . fst)
 
+part2 = part1 . map (\(c, b) -> (map repl c, b)) where
+
+repl 11 = 1
+repl x = x
+
 main = do
     input <- fmap parseInput getContents
     print $ part1 input
+    print $ part2 input
