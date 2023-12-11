@@ -38,18 +38,19 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut part1 = 0;
+    let mut gaps = 0;
     for (i, (ay, ax)) in galaxies.iter().enumerate() {
         for (by, bx) in &galaxies[i + 1..] {
             for i in 0..isize::abs(*ay as isize - *by as isize) {
                 if empty_rows.contains(&(i as usize + usize::min(*ay, *by))) {
-                    part1 += 2;
+                    gaps += 1;
                 } else {
                     part1 += 1;
                 }
             }
             for i in 0..isize::abs(*ax as isize - *bx as isize) {
                 if empty_cols.contains(&(i as usize + usize::min(*ax, *bx))) {
-                    part1 += 2;
+                    gaps += 1;
                 } else {
                     part1 += 1;
                 }
@@ -58,4 +59,10 @@ fn main() {
     }
 
     println!("{}", part1);
+
+    let gap_p = 6usize;
+    let gap = 10usize.pow(gap_p as u32);
+    gaps += part1 / gap;
+    part1 = part1 % gap;
+    println!("{}{:0>gap_p$}", gaps, part1);
 }
