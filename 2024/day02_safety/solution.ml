@@ -16,4 +16,10 @@ let safe l = (inc_or_dec l) && (small_diff l)
 
 let part1 = List.length (List.filter safe numbers)
 
+let damp_safe l = let f i = List.filteri (fun j x -> j != i) l |> safe in
+    List.init (List.length l) f
+    |> List.exists (fun x -> x)
+let part2 = List.length (List.filter damp_safe numbers)
+
 let () = Printf.printf "%d\n" part1
+let () = Printf.printf "%d\n" part2
