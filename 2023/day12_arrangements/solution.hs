@@ -1,8 +1,12 @@
-import Data.List.Split (splitOn)
-import Data.List (group)
+import Data.List (group, elemIndex)
+
+splitOn c x = case elemIndex c x of
+    Nothing -> [x]
+    Just i -> let (y, ys) = splitAt i x
+              in y : splitOn c (drop 1 ys)
 
 parseInput :: String -> [(String, [Int])]
-parseInput = map ((\[a, b] -> (a, map read $ splitOn "," b)) . words) . lines
+parseInput = map ((\[a, b] -> (a, map read $ splitOn ',' b)) . words) . lines
 
 potential :: String -> [String]
 potential ['?'] = [".", "#"]
