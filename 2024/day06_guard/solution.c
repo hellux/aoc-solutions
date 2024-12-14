@@ -61,6 +61,34 @@ size_t part1(struct grid grid, const size_t w, const size_t h, struct guard g) {
     return n;
 }
 
+bool obstacle_loops(const struct grid *grid, const size_t w, const size_t h, struct guard g,
+                    const size_t obstacle_x, const size_t obstacle_y) {
+    size_t n = 0;
+    while (g.x < w && g.y < h) {
+        struct guard gn = move_forward(g);
+        if (grid->c[gn.y][gn.x] == '#' || (gn.x == obstacle_x && gn.y == obstacle_y)) {
+            g = turn_right(g);
+        } else {
+            g = gn;
+        }
+        n++;
+        if (n > 10000)
+            return true;
+    }
+    return false;
+}
+
+size_t part2(const struct grid *grid, const size_t w, const size_t h, const struct guard g) {
+    size_t n = 0;
+    for (size_t y = 0; y < h; y++) {
+        for (size_t x = 0; x < w; x++) {
+            if (grid->c[y][x] == '.' && obstacle_loops(grid, w, h, g, x, y))
+                n++;
+        }
+    }
+    return n;
+}
+
 int main() {
     struct grid grid;
     size_t h = 0;
@@ -84,4 +112,5 @@ int main() {
     const struct guard g = {x, y, 0u};
 
     printf("%lu\n", part1(grid, w, h, g));
+    printf("%lu\n", part2(&grid, w, h, g));
 }
