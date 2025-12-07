@@ -41,6 +41,17 @@ p1(Lines) ->
     )),
     eval_sheet(OpsStr, Cols).
 
+p2(Lines) ->
+    {RowsStrs, [OpsStr]} = lists:split(length(Lines) - 1, Lines),
+    Cols = lists:map(
+        fun(Row) -> lists:map(fun(C) -> list_to_integer(string:trim(C)) end, Row) end,
+        split_on(
+            fun(Col) -> length(string:trim(Col)) =:= 0 end,
+            transpose(RowsStrs)
+        )
+    ),
+    eval_sheet(OpsStr, Cols).
+
 main(_) ->
     Lines = get_lines(),
-    io:format("~p~n", [p1(Lines)]).
+    io:format("~p~n~p~n", [p1(Lines), p2(Lines)]).
