@@ -30,6 +30,24 @@ p1(M) ->
     ),
     length(lists:filter(fun(S) -> reaches_start(M, S) end, Splitters)).
 
+p2(M) -> 1 + p2(M, {1, string:str(tuple_to_list(element(1, M)), "S")}).
+p2_i(_, {_, 0}) -> 0;
+p2_i(M, {Y, X}) when X > tuple_size(element(1, M));
+                     Y > tuple_size(M) -> 0;
+p2_i(M, {Y, X}) when element(X, element(Y, M)) =:= $^ ->
+    1 + p2(M, {Y, X+1}) + p2(M, {Y, X-1});
+p2_i(M, {Y, X}) -> p2(M, {Y+1, X}).
+
+p2(M, P) -> % must memoize
+    case ets:lookup(p2, P) of
+        [] ->
+            N = p2_i(M, P),
+            ets:insert(p2, {P, N}),
+            N;
+        [{P, N}] -> N
+    end.
+
 main(_) ->
     Manifold = get_input(),
-    io:format("~p~n", [p1(Manifold)]).
+    ets:new(p2, [public, named_table]),
+    io:format("~p~n~p~n", [p1(Manifold), p2(Manifold)]).
